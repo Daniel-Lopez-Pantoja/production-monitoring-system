@@ -23,8 +23,9 @@ export default function Login() {
   return (
     <section className="login-page">
       <form className="login-panel" onSubmit={handleSubmit}>
+        <div className="login-brand">PMS</div>
         <h1>Production Monitoring System</h1>
-        <p>Acceso para equipos de Test Engineering, manufactura y soporte.</p>
+        <p>Server Validation & Manufacturing Tracking for Test Engineering, manufacturing and quality teams.</p>
         <label>Correo<input value={email} onChange={(e) => setEmail(e.target.value)} /></label>
         <label>Contraseña<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
         {error && <div className="error">{error}</div>}

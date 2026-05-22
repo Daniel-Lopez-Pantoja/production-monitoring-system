@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface FailureRepository extends JpaRepository<Failure, Long> {
     long countBySeverity(Severity severity);
+    long countByStatus(FailureStatus status);
     long countByStatusNot(FailureStatus status);
     boolean existsByServerIdAndStatusNot(Long serverId, FailureStatus status);
     List<Failure> findTop5ByOrderByDetectedAtDesc();
