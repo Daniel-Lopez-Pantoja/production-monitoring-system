@@ -2,37 +2,133 @@ import { useEffect, useMemo, useState } from 'react';
 import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
 
-// Matriz de trazabilidad con búsqueda global por serial, prueba, resultado, PDU o severidad.
+// Da formato legible a las fechas de trazabilidad sin ocupar demasiado espacio en la tabla.
+function formatTraceDate(value) {
+  if (!value) return 'N/A';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(new Date(value));
+}
+
+// Une los campos importantes de un registro para permitir búsqueda operacional por serial, rack, PDU, prueba, falla o responsable.
+function buildSearchText(record) {
+  return [
+    record.server?.serialNumber,
+    record.server?.model,
+    record.server?.rackNumber,
+    record.server?.location,
+    record.coldRoom,
+    record.physicalLocation,
+    record.pdu?.name,
+    record.pduPort,
+    record.raspberry?.name,
+    record.testCatalog?.name,
+    record.testStatus,
+    record.result,
+    record.detectedFailure,
+    record.severity,
+    record.responsibleEngineer?.fullName,
+    record.responsibleTechnician?.fullName,
+    record.startDate,
+    record.endDate,
+    record.createdAt,
+    record.updatedAt
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+// Matriz de trazabilidad con carga, error, estado vacío y búsqueda por campos técnicos clave.
 export default function Traceability() {
   const [records, setRecords] = useState([]);
   const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  useEffect(() => { api.get('/traceability').then((res) => setRecords(res.data)); }, []);
+  useEffect(() => {
+    api.get('/traceability')
+      .then((res) => setRecords(res.data))
+      .catch(() => setError('Traceability data could not be loaded. Please verify the backend service.'))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const filtered = useMemo(() => records.filter((record) => JSON.stringify(record).toLowerCase().includes(query.toLowerCase())), [records, query]);
+  const filtered = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return records;
+    return records.filter((record) => buildSearchText(record).includes(normalizedQuery));
+  }, [records, query]);
 
   return (
     <section className="page">
-      <div className="page-title"><h1>Matriz de trazabilidad</h1><p>Historial completo de pruebas, fallas, evidencia y acciones.</p></div>
-      <input className="search" placeholder="Buscar por serial, prueba, resultado, falla, PDU, Raspberry, severidad..." value={query} onChange={(e) => setQuery(e.target.value)} />
-      <div className="panel table-panel">
-        <table>
-          <thead><tr><th>Serial</th><th>Prueba</th><th>Estado</th><th>Resultado</th><th>Severidad</th><th>PDU</th><th>Raspberry</th></tr></thead>
-          <tbody>
-            {filtered.map((record) => (
-              <tr key={record.id}>
-                <td>{record.server?.serialNumber}</td>
-                <td>{record.testCatalog?.name}</td>
-                <td><StatusBadge value={record.testStatus} /></td>
-                <td>{record.result}</td>
-                <td><StatusBadge value={record.severity} /></td>
-                <td>{record.pdu?.name || 'N/A'} {record.pduPort || ''}</td>
-                <td>{record.raspberry?.name || 'N/A'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="page-title">
+        <h1>Traceability Matrix</h1>
+        <p>Complete server validation history with test status, physical location, power mapping, automation devices and failure evidence.</p>
       </div>
+
+      <input
+        className="search"
+        placeholder="Search by serial, model, rack, location, PDU, Raspberry, test, status, result, failure, severity, engineer, technician or date..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+
+      {loading && <div className="panel empty-state">Loading traceability records...</div>}
+      {error && <div className="error">{error}</div>}
+
+      {!loading && !error && (
+        <div className="panel table-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Serial</th>
+                <th>Model</th>
+                <th>Rack</th>
+                <th>Location</th>
+                <th>Test</th>
+                <th>Status</th>
+                <th>Result</th>
+                <th>Severity</th>
+                <th>PDU</th>
+                <th>Raspberry</th>
+                <th>Engineer</th>
+                <th>Technician</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((record) => (
+                <tr key={record.id}>
+                  <td>{record.server?.serialNumber || 'N/A'}</td>
+                  <td>{record.server?.model || 'N/A'}</td>
+                  <td>{record.server?.rackNumber || record.physicalLocation || 'N/A'}</td>
+                  <td>{record.coldRoom || record.server?.location || 'N/A'}</td>
+                  <td>{record.testCatalog?.name || 'N/A'}</td>
+                  <td><StatusBadge value={record.testStatus} /></td>
+                  <td>
+                    <strong>{record.result || 'N/A'}</strong>
+                    {record.detectedFailure && <span className="table-subtext">{record.detectedFailure}</span>}
+                  </td>
+                  <td>{record.severity ? <StatusBadge value={record.severity} /> : <span className="muted-text">N/A</span>}</td>
+                  <td>{record.pdu?.name || 'N/A'} {record.pduPort ? <span className="table-subtext">{record.pduPort}</span> : null}</td>
+                  <td>{record.raspberry?.name || 'N/A'}</td>
+                  <td>{record.responsibleEngineer?.fullName || 'Unassigned'}</td>
+                  <td>{record.responsibleTechnician?.fullName || 'Unassigned'}</td>
+                  <td>{formatTraceDate(record.endDate || record.updatedAt || record.createdAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {filtered.length === 0 && (
+            <div className="empty-state">
+              <strong>No traceability records found.</strong>
+              <span>Try adjusting the search criteria or verify that traceability seed data has been loaded.</span>
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }
