@@ -1,0 +1,90 @@
+{
+  "info": {
+    "name": "Production Monitoring System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/login",
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@pms.local\",\n  \"password\": \"admin123\"\n}" }
+      }
+    },
+    {
+      "name": "Servers - Get all",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/servers"
+      }
+    },
+    {
+      "name": "Servers - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/servers",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"internalId\": \"PMS-100\",\n  \"serialNumber\": \"R10SN0100\",\n  \"model\": \"R10\",\n  \"rackNumber\": \"A02\",\n  \"location\": \"Cold Room 1\",\n  \"status\": \"PENDING_OS\",\n  \"observations\": \"Alta desde Postman\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Server Tests - Create result",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/server-tests",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"serverId\": 1,\n  \"testCatalogId\": 1,\n  \"status\": \"PASSED\",\n  \"result\": \"OS installed successfully\",\n  \"technicianId\": 3,\n  \"comments\": \"Instalación completada sin errores\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Traceability - Get all",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/traceability"
+      }
+    },
+    {
+      "name": "Failures - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/failures",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"serverId\": 1,\n  \"testCatalogId\": 1,\n  \"description\": \"No detecta USB durante instalación\",\n  \"severity\": \"HIGH\",\n  \"status\": \"OPEN\",\n  \"correctiveAction\": \"Revisar puerto USB y repetir instalación\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Reports - Servers by status",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/reports/servers-by-status"
+      }
+    }
+  ]
+}
