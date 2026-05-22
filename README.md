@@ -1,14 +1,16 @@
 # Production Monitoring System
 
-Sistema Full Stack para monitorear servidores en ambientes de manufactura, laboratorio y pruebas. El proyecto está pensado como una aplicación interna para equipos de Test Engineering, con trazabilidad por serial, control de estados, catálogo de pruebas, registro de fallas, acciones correctivas y reportes.
+Full Stack enterprise-oriented application for monitoring servers across manufacturing, laboratory, and test engineering environments. The system is designed as an internal production tracking platform for Test Engineering teams, providing serial-level traceability, lifecycle state management, test execution tracking, failure registration, corrective actions, evidence references, and operational reporting.
 
-**Autor:** Juan Daniel López Pantoja
+**Author:** Juan Daniel López Pantoja
 
-## Objetivo
+## Objective
 
-Construir una base profesional para un sistema empresarial de monitoreo de producción, enfocado en servidores R9/R10, pruebas funcionales, fallas, evidencias y liberación controlada.
+Build a professional foundation for an enterprise production monitoring system focused on R9/R10 server validation, functional testing workflows, failure management, technical evidence, corrective actions, and controlled server release processes.
 
-## Tecnologías
+This project is intended to demonstrate Java Backend Development skills in a real-world business domain, including layered architecture, REST API design, JWT-based security, relational data modeling, validation rules, and a React-based operational dashboard.
+
+## Technologies
 
 **Backend**
 - Java 17
@@ -16,7 +18,7 @@ Construir una base profesional para un sistema empresarial de monitoreo de produ
 - Spring Web
 - Spring Data JPA
 - Spring Validation
-- Spring Security con JWT
+- Spring Security with JWT
 - MySQL
 - Maven
 - Swagger/OpenAPI
@@ -29,47 +31,47 @@ Construir una base profesional para un sistema empresarial de monitoreo de produ
 - HTML/CSS
 - Lucide React
 
-**Herramientas**
-- Docker Compose para MySQL
-- Postman Collection en `docs/postman_collection.json`
-- `.env.example`
+**Tools**
+- Docker Compose for MySQL
+- Postman Collection located at `docs/postman_collection.json`
+- `.env.example` for environment configuration
 
-## Funcionalidades
+## Features
 
-- Login y registro con JWT.
-- Roles: `ADMIN`, `ENGINEER`, `TECHNICIAN`, `OPERATOR`.
-- Gestión de servidores.
-- Matriz de trazabilidad.
-- Catálogo inicial de 16 pruebas.
-- Registro de fallas con severidad y estado.
-- Validaciones de negocio:
-  - Serial obligatorio y único.
-  - ID interno único.
-  - No liberar servidores con fallas abiertas.
-  - No liberar servidores con pruebas críticas fallidas.
-- Dashboard con métricas principales.
-- Filtros por texto en tablas.
-- Reportes agregados y exportación CSV desde frontend.
-- Seed data con usuarios, pruebas, servidores, PDUs, Raspberry devices y fallas.
+- Authentication and user registration using JWT.
+- Role-based access model: `ADMIN`, `ENGINEER`, `TECHNICIAN`, `OPERATOR`.
+- Server asset management for production and test environments.
+- Traceability matrix for complete server and test history.
+- Initial test catalog with 16 manufacturing and validation test cases.
+- Failure tracking with severity, status, corrective action, comments, and evidence references.
+- Business rule validation:
+  - Required and unique server serial number.
+  - Unique internal server ID.
+  - Prevents server release when open failures exist.
+  - Prevents server release when critical tests have failed.
+- Dashboard with key production and test metrics.
+- Text-based filtering across operational tables.
+- Aggregated reports with CSV export from the frontend.
+- Seed data for users, roles, tests, servers, PDUs, Raspberry devices, server test results, and failures.
 
-## Usuarios iniciales
+## Initial Users
 
-| Rol | Email | Password |
+| Role | Email | Password |
 | --- | --- | --- |
 | ADMIN | `admin@pms.local` | `admin123` |
 | ENGINEER | `engineer@pms.local` | `engineer123` |
 | TECHNICIAN | `technician@pms.local` | `tech123` |
 | OPERATOR | `operator@pms.local` | `operator123` |
 
-## Cómo correr MySQL
+## Running MySQL
 
 ```bash
 docker compose up -d
 ```
 
-La base se crea como `production_monitoring` con usuario `root` y password `root`.
+The database is created as `production_monitoring` using `root` as the username and `root` as the password.
 
-## Cómo correr backend
+## Running the Backend
 
 ```bash
 cd backend
@@ -80,7 +82,7 @@ API:
 - `http://localhost:8080/api`
 - Swagger: `http://localhost:8080/swagger-ui.html`
 
-Variables soportadas:
+Supported environment variables:
 
 ```env
 DB_URL=jdbc:mysql://localhost:3306/production_monitoring?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
@@ -90,7 +92,7 @@ JWT_SECRET=ProductionMonitoringSystemSecretKeyForJwtMustBeLongEnough2026
 JWT_EXPIRATION_MS=86400000
 ```
 
-## Cómo correr frontend
+## Running the Frontend
 
 ```bash
 cd frontend
@@ -101,38 +103,38 @@ npm run dev
 Frontend:
 - `http://localhost:5173`
 
-Variable soportada:
+Supported environment variable:
 
 ```env
 VITE_API_URL=http://localhost:8080/api
 ```
 
-## Endpoints principales
+## Main Endpoints
 
-| Método | Endpoint | Descripción |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| POST | `/api/auth/login` | Login y generación de JWT |
-| POST | `/api/auth/register` | Registro de usuario |
-| GET | `/api/servers` | Listar servidores |
-| POST | `/api/servers` | Crear servidor |
-| GET | `/api/servers/{id}` | Consultar servidor |
-| PUT | `/api/servers/{id}` | Actualizar servidor |
-| DELETE | `/api/servers/{id}` | Eliminar servidor |
-| GET | `/api/tests` | Consultar catálogo de pruebas |
-| GET | `/api/server-tests` | Consultar resultados de pruebas |
-| POST | `/api/server-tests` | Registrar resultado de prueba |
-| GET | `/api/traceability` | Consultar matriz de trazabilidad |
-| POST | `/api/traceability` | Crear registro de trazabilidad |
-| GET | `/api/failures` | Listar fallas |
-| POST | `/api/failures` | Registrar falla |
-| GET | `/api/dashboard` | Métricas del dashboard |
-| GET | `/api/reports/servers-by-status` | Reporte de servidores por estado |
-| GET | `/api/reports/failures-by-test` | Reporte de fallas por prueba |
-| GET | `/api/reports/failures-by-model` | Reporte de fallas por modelo |
-| GET | `/api/pdus` | Listar PDUs |
-| GET | `/api/raspberries` | Listar Raspberry devices |
+| POST | `/api/auth/login` | Authenticates a user and returns a JWT |
+| POST | `/api/auth/register` | Registers a new user |
+| GET | `/api/servers` | Retrieves all registered servers |
+| POST | `/api/servers` | Creates a new server record |
+| GET | `/api/servers/{id}` | Retrieves a server by ID |
+| PUT | `/api/servers/{id}` | Updates an existing server |
+| DELETE | `/api/servers/{id}` | Deletes a server |
+| GET | `/api/tests` | Retrieves the test catalog |
+| GET | `/api/server-tests` | Retrieves server test execution results |
+| POST | `/api/server-tests` | Registers a server test result |
+| GET | `/api/traceability` | Retrieves the traceability matrix |
+| POST | `/api/traceability` | Creates a traceability record |
+| GET | `/api/failures` | Retrieves registered failures |
+| POST | `/api/failures` | Registers a new failure |
+| GET | `/api/dashboard` | Retrieves dashboard metrics |
+| GET | `/api/reports/servers-by-status` | Retrieves server counts grouped by status |
+| GET | `/api/reports/failures-by-test` | Retrieves failure counts grouped by test |
+| GET | `/api/reports/failures-by-model` | Retrieves failure counts grouped by server model |
+| GET | `/api/pdus` | Retrieves registered PDUs |
+| GET | `/api/raspberries` | Retrieves registered Raspberry devices |
 
-## Estructura del repositorio
+## Repository Structure
 
 ```text
 Production Monitoring System/
@@ -163,18 +165,18 @@ Production Monitoring System/
 └── README.md
 ```
 
-## Capturas sugeridas para GitHub
+## Suggested GitHub Screenshots
 
-- Login.
-- Dashboard con métricas.
-- Lista de servidores filtrada.
-- Detalle de servidor.
-- Matriz de trazabilidad.
-- Catálogo de pruebas.
-- Reportes exportables.
-- Swagger UI.
+- Login screen.
+- Dashboard with operational metrics.
+- Filtered server inventory view.
+- Server detail view.
+- Traceability matrix.
+- Test catalog.
+- Exportable reports.
+- Swagger UI documentation.
 
-## Commits sugeridos
+## Suggested Commits
 
 ```bash
 git add .
@@ -183,12 +185,12 @@ git commit -m "feat: add react dashboard and monitoring views"
 git commit -m "docs: add setup guide and postman collection"
 ```
 
-## Próximas mejoras
+## Future Improvements
 
-- Edición completa de registros desde frontend.
-- Pruebas unitarias y de integración.
-- Exportación CSV desde backend.
-- Auditoría por usuario autenticado.
-- Carga de evidencias/logs en storage.
-- Gráficas avanzadas por fecha, modelo y severidad.
-- Pipeline CI/CD con GitHub Actions.
+- Full create/edit workflows for all operational records from the frontend.
+- Unit and integration test coverage for services, controllers, and business rules.
+- Backend-driven CSV export for reports.
+- Authenticated user auditing for traceability and failure history.
+- Evidence and log file upload using external or cloud storage.
+- Advanced analytics by date range, server model, failure severity, and test category.
+- CI/CD pipeline with GitHub Actions.
