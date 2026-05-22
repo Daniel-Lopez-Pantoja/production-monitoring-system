@@ -165,25 +165,31 @@ Production Monitoring System/
 └── README.md
 ```
 
-## Suggested GitHub Screenshots
+## Application Preview
 
-- Login screen.
-- Dashboard with operational metrics.
-- Filtered server inventory view.
-- Server detail view.
-- Traceability matrix.
-- Test catalog.
-- Exportable reports.
-- Swagger UI documentation.
+### Login Page
+![Login](docs/images/login-page.png)
 
-## Suggested Commits
+### Dashboard
+![Dashboard](docs/images/dashboard-overview.png)
 
-```bash
-git add .
-git commit -m "feat: create production monitoring backend"
-git commit -m "feat: add react dashboard and monitoring views"
-git commit -m "docs: add setup guide and postman collection"
-```
+### Server Management
+![Server Management](docs/images/server-management.png)
+
+### Traceability Matrix
+![Traceability Matrix](docs/images/traceability-matrix.png)
+
+### Failure Management
+![Failure Management](docs/images/failure-management.png)
+
+### Test Catalog
+![Test Catalog](docs/images/test-catalog.png)
+
+### Reports
+![Reports](docs/images/reports-dashboard.png)
+
+### Swagger API
+![Swagger](docs/images/swagger-api.png)
 
 ## Future Improvements
 
