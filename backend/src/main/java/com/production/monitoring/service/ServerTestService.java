@@ -32,11 +32,11 @@ public class ServerTestService {
      */
     public ServerTest create(ServerTestRequest request) {
         ServerTest test = new ServerTest();
-        test.setServer(serverRepository.findById(request.serverId()).orElseThrow(() -> new ResourceNotFoundException("Servidor no encontrado.")));
-        test.setTestCatalog(testCatalogRepository.findById(request.testCatalogId()).orElseThrow(() -> new ResourceNotFoundException("Prueba no encontrada.")));
+        test.setServer(serverRepository.findById(request.serverId()).orElseThrow(() -> new ResourceNotFoundException("Server not found.")));
+        test.setTestCatalog(testCatalogRepository.findById(request.testCatalogId()).orElseThrow(() -> new ResourceNotFoundException("Test not found.")));
         test.setStatus(request.status());
         test.setResult(request.result());
-        test.setTechnician(userRepository.findById(request.technicianId()).orElseThrow(() -> new ResourceNotFoundException("Técnico no encontrado.")));
+        test.setTechnician(userRepository.findById(request.technicianId()).orElseThrow(() -> new ResourceNotFoundException("Technician not found.")));
         test.setStartedAt(request.startedAt());
         test.setFinishedAt(request.finishedAt());
         test.setComments(request.comments());

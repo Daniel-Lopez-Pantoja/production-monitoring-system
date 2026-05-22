@@ -31,8 +31,8 @@ public class TraceabilityService {
      */
     public TraceabilityRecord create(TraceabilityRequest request) {
         TraceabilityRecord record = new TraceabilityRecord();
-        record.setServer(serverRepository.findById(request.serverId()).orElseThrow(() -> new ResourceNotFoundException("Servidor no encontrado.")));
-        record.setTestCatalog(testCatalogRepository.findById(request.testCatalogId()).orElseThrow(() -> new ResourceNotFoundException("Prueba no encontrada.")));
+        record.setServer(serverRepository.findById(request.serverId()).orElseThrow(() -> new ResourceNotFoundException("Server not found.")));
+        record.setTestCatalog(testCatalogRepository.findById(request.testCatalogId()).orElseThrow(() -> new ResourceNotFoundException("Test not found.")));
         record.setRaspberry(request.raspberryId() == null ? null : raspberryRepository.findById(request.raspberryId()).orElseThrow());
         record.setPdu(request.pduId() == null ? null : pduRepository.findById(request.pduId()).orElseThrow());
         record.setPduPort(request.pduPort());

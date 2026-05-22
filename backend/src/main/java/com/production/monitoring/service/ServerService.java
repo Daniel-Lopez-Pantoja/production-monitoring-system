@@ -33,7 +33,7 @@ public class ServerService {
     }
 
     public ProductionServer findById(Long id) {
-        return serverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Servidor no encontrado."));
+        return serverRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Server not found."));
     }
 
     /**
@@ -41,10 +41,10 @@ public class ServerService {
      */
     public ProductionServer create(ServerRequest request) {
         if (serverRepository.existsBySerialNumber(request.serialNumber())) {
-            throw new BusinessRuleException("El serial ya existe.");
+            throw new BusinessRuleException("The serial number already exists.");
         }
         if (serverRepository.existsByInternalId(request.internalId())) {
-            throw new BusinessRuleException("El ID interno ya existe.");
+            throw new BusinessRuleException("The internal ID already exists.");
         }
         ProductionServer server = new ProductionServer();
         copy(request, server);
@@ -59,8 +59,8 @@ public class ServerService {
         if (request.status() == ServerStatus.RELEASED) {
             boolean hasOpenFailures = failureRepository.existsByServerIdAndStatusNot(id, FailureStatus.CLOSED);
             boolean hasCriticalFailedTests = serverTestRepository.existsByServerIdAndTestCatalogCriticalTrueAndStatus(id, TestStatus.FAILED);
-            if (hasOpenFailures) throw new BusinessRuleException("No se puede liberar un servidor con fallas abiertas.");
-            if (hasCriticalFailedTests) throw new BusinessRuleException("No se puede liberar un servidor con pruebas críticas fallidas.");
+            if (hasOpenFailures) throw new BusinessRuleException("A server cannot be released while open failures exist.");
+            if (hasCriticalFailedTests) throw new BusinessRuleException("A server cannot be released while critical tests are failed.");
         }
         copy(request, server);
         return serverRepository.save(server);

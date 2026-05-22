@@ -51,7 +51,7 @@
         "url": "{{baseUrl}}/server-tests",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"serverId\": 1,\n  \"testCatalogId\": 1,\n  \"status\": \"PASSED\",\n  \"result\": \"OS installed successfully\",\n  \"technicianId\": 3,\n  \"comments\": \"Instalación completada sin errores\"\n}"
+          "raw": "{\n  \"serverId\": 1,\n  \"testCatalogId\": 1,\n  \"status\": \"PASSED\",\n  \"result\": \"OS installed successfully\",\n  \"technicianId\": 3,\n  \"comments\": \"Installation completed without errors\"\n}"
         }
       }
     },
@@ -74,7 +74,7 @@
         "url": "{{baseUrl}}/failures",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"serverId\": 1,\n  \"testCatalogId\": 1,\n  \"description\": \"No detecta USB durante instalación\",\n  \"severity\": \"HIGH\",\n  \"status\": \"OPEN\",\n  \"correctiveAction\": \"Revisar puerto USB y repetir instalación\"\n}"
+          "raw": "{\n  \"serverId\": 1,\n  \"testCatalogId\": 1,\n  \"description\": \"USB device not detected during installation\",\n  \"severity\": \"HIGH\",\n  \"status\": \"OPEN\",\n  \"correctiveAction\": \"Inspect USB port and repeat the installation process\"\n}"
         }
       }
     },

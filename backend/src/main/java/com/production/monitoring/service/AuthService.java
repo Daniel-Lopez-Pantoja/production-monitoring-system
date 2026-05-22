@@ -29,7 +29,7 @@ public class AuthService {
      */
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new BusinessRuleException("El correo ya está registrado.");
+            throw new BusinessRuleException("The email address is already registered.");
         }
         User user = new User();
         user.setFullName(request.fullName());

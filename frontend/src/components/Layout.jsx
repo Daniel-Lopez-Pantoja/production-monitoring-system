@@ -5,12 +5,12 @@ import { useTheme } from '../context/ThemeContext.jsx';
 
 const links = [
   ['/', 'Dashboard', LayoutDashboard],
-  ['/servers', 'Servidores', Server],
-  ['/traceability', 'Trazabilidad', ClipboardList],
-  ['/tests', 'Pruebas', Cpu],
-  ['/failures', 'Fallas', AlertTriangle],
-  ['/reports', 'Reportes', Database],
-  ['/users', 'Usuarios', Users]
+  ['/servers', 'Server Management', Server],
+  ['/traceability', 'Traceability Matrix', ClipboardList],
+  ['/tests', 'Test Catalog', Cpu],
+  ['/failures', 'Failure Management', AlertTriangle],
+  ['/reports', 'Reports & Analytics', Database],
+  ['/users', 'Users', Users]
 ];
 
 // Layout principal con navegación lateral y encabezado de sesión.
@@ -44,10 +44,10 @@ export default function Layout() {
           <div className="topbar-actions">
             <span className="environment-badge">Manufacturing Dashboard</span>
             <span className="user-chip">{user?.fullName} · {user?.role}</span>
-            <button className="icon-button" onClick={toggleTheme} title={isDark ? 'Activar modo claro' : 'Activar modo oscuro'}>
+            <button className="icon-button" onClick={toggleTheme} title={isDark ? 'Enable light mode' : 'Enable dark mode'}>
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button className="icon-button" onClick={logout} title="Cerrar sesión"><LogOut size={18} /></button>
+            <button className="icon-button" onClick={logout} title="Sign out"><LogOut size={18} /></button>
           </div>
         </header>
         <Outlet />

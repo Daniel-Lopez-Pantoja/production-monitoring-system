@@ -13,7 +13,7 @@
     <artifactId>monitoring</artifactId>
     <version>1.0.0</version>
     <name>Production Monitoring System</name>
-    <description>Sistema full stack para monitoreo de servidores, trazabilidad y pruebas de manufactura.</description>
+    <description>Full stack system for server traceability, validation workflows and manufacturing quality monitoring.</description>
     <properties>
         <java.version>17</java.version>
     </properties>

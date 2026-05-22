@@ -2,6 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
 
+// Normaliza nombres de pruebas recibidos desde la API.
+function displayTestName(name) {
+  return name || 'N/A';
+}
+
+// Normaliza textos de fallas recibidos desde la API.
+function displayFailureText(value) {
+  return value || 'N/A';
+}
+
 // Registro de fallas con filtros por serial, prueba, severidad, estado o técnico.
 export default function Failures() {
   const [failures, setFailures] = useState([]);
@@ -12,19 +22,19 @@ export default function Failures() {
 
   return (
     <section className="page">
-      <div className="page-title"><h1>Fallas</h1><p>Seguimiento de defectos, severidad y acciones correctivas.</p></div>
-      <input className="search" placeholder="Buscar por serial, prueba, falla, técnico, severidad..." value={query} onChange={(e) => setQuery(e.target.value)} />
+      <div className="page-title"><h1>Failure Management</h1><p>Failure tracking, severity control and corrective action follow-up.</p></div>
+      <input className="search" placeholder="Search by serial, test, failure, technician or severity..." value={query} onChange={(e) => setQuery(e.target.value)} />
       <div className="panel table-panel">
         <table>
-          <thead><tr><th>Serial</th><th>Prueba</th><th>Descripción</th><th>Severidad</th><th>Estado</th><th>Acción</th></tr></thead>
+          <thead><tr><th>Serial</th><th>Test</th><th>Description</th><th>Severity</th><th>Status</th><th>Corrective Action</th></tr></thead>
           <tbody>{filtered.map((failure) => (
             <tr key={failure.id}>
               <td>{failure.server?.serialNumber}</td>
-              <td>{failure.testCatalog?.name}</td>
-              <td>{failure.description}</td>
+              <td>{displayTestName(failure.testCatalog?.name)}</td>
+              <td>{displayFailureText(failure.description)}</td>
               <td><StatusBadge value={failure.severity} /></td>
               <td><StatusBadge value={failure.status} /></td>
-              <td>{failure.correctiveAction}</td>
+              <td>{displayFailureText(failure.correctiveAction)}</td>
             </tr>
           ))}</tbody>
         </table>

@@ -15,13 +15,13 @@ export default function Servers() {
   return (
     <section className="page">
       <div className="page-title row">
-        <div><h1>Servidores</h1><p>Registro y seguimiento de unidades R9, R10 y otros modelos.</p></div>
-        <Link className="primary-link" to="/servers/new">Nuevo servidor</Link>
+        <div><h1>Server Management</h1><p>Registration and lifecycle tracking for R9, R10 and additional validation units.</p></div>
+        <Link className="primary-link" to="/servers/new">New Server</Link>
       </div>
-      <input className="search" placeholder="Buscar por serial, modelo, estado, ingeniero, técnico..." value={query} onChange={(e) => setQuery(e.target.value)} />
+      <input className="search" placeholder="Search by serial, model, status, engineer or technician..." value={query} onChange={(e) => setQuery(e.target.value)} />
       <div className="panel table-panel">
         <table>
-          <thead><tr><th>Serial</th><th>Modelo</th><th>Rack</th><th>Ubicación</th><th>Estado</th><th>Responsable</th></tr></thead>
+          <thead><tr><th>Serial</th><th>Model</th><th>Rack</th><th>Location</th><th>Status</th><th>Owner</th></tr></thead>
           <tbody>
             {filtered.map((server) => (
               <tr key={server.id}>
@@ -30,7 +30,7 @@ export default function Servers() {
                 <td>{server.rackNumber}</td>
                 <td>{server.location}</td>
                 <td><StatusBadge value={server.status} /></td>
-                <td>{server.responsibleEngineer?.fullName || 'Sin asignar'}</td>
+                <td>{server.responsibleEngineer?.fullName || 'Unassigned'}</td>
               </tr>
             ))}
           </tbody>

@@ -7,16 +7,16 @@ export default function Users() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
 
-  useEffect(() => { api.get('/users').then((res) => setUsers(res.data)).catch(() => setError('Solo ADMIN puede consultar usuarios.')); }, []);
+  useEffect(() => { api.get('/users').then((res) => setUsers(res.data)).catch(() => setError('Only ADMIN users can view user accounts.')); }, []);
 
   return (
     <section className="page">
-      <div className="page-title"><h1>Usuarios</h1><p>Roles y accesos del sistema.</p></div>
+      <div className="page-title"><h1>Users</h1><p>System roles and access control.</p></div>
       {error && <div className="error">{error}</div>}
       <div className="panel table-panel">
         <table>
-          <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Activo</th></tr></thead>
-          <tbody>{users.map((user) => <tr key={user.id}><td>{user.fullName}</td><td>{user.email}</td><td><StatusBadge value={user.role} /></td><td>{user.active ? 'Sí' : 'No'}</td></tr>)}</tbody>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Active</th></tr></thead>
+          <tbody>{users.map((user) => <tr key={user.id}><td>{user.fullName}</td><td>{user.email}</td><td><StatusBadge value={user.role} /></td><td>{user.active ? 'Yes' : 'No'}</td></tr>)}</tbody>
         </table>
       </div>
     </section>

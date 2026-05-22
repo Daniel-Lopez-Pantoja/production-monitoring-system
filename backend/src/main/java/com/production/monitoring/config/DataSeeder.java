@@ -25,6 +25,7 @@ public class DataSeeder implements CommandLineRunner {
     private final PduRepository pduRepository;
     private final RaspberryDeviceRepository raspberryRepository;
     private final ServerTestRepository serverTestRepository;
+    private final TraceabilityRecordRepository traceabilityRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -33,6 +34,7 @@ public class DataSeeder implements CommandLineRunner {
         seedDevices();
         seedTests();
         seedServersAndFailures();
+        seedTraceabilityRecords();
     }
 
     private void seedUsers() {
@@ -40,7 +42,7 @@ public class DataSeeder implements CommandLineRunner {
             if (!roleRepository.existsByName(roleName)) {
                 Role role = new Role();
                 role.setName(roleName);
-                role.setDescription("Rol " + roleName.name() + " del sistema.");
+                role.setDescription("System role for " + roleName.name() + " users.");
                 roleRepository.save(role);
             }
         }
@@ -102,37 +104,57 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedTests() {
         List<String[]> tests = List.of(
-                row("Instalación de sistema operativo", "Valida que el servidor pueda bootear e instalar imagen/base OS.", "No detecta discos/USB; falla de boot por BIOS/UEFI; imagen corrupta.", true),
-                row("POST / Power On Self Test", "Valida motherboard, CPU, RAM, BIOS y periféricos.", "No da video/POST; error de memoria; reinicio en inicialización.", true),
-                row("BMC / IPMI / Redfish", "Valida sensores, logs, energía e inventario remoto.", "BMC sin red; sensores erróneos; firmware corrupto.", true),
-                row("BIOS / Firmware Check", "Valida versiones de BIOS, BMC, CPLD, NIC y RAID.", "Versión incorrecta; update fallido; incompatibilidad BIOS-BMC.", true),
-                row("Prueba de memoria RAM", "Valida estabilidad de DIMMs bajo lectura/escritura.", "DIMM no detectado; errores ECC; thermal trip.", true),
-                row("Prueba de CPU", "Valida carga, núcleos, frecuencia, temperatura y estabilidad.", "CPU no detectada; throttling; crash bajo estrés.", true),
-                row("Prueba de almacenamiento", "Valida discos, RAID, SMART y velocidad.", "Disco no aparece; SMART con errores; baja velocidad.", true),
-                row("Prueba de red Ethernet", "Valida link, velocidad, tráfico y pérdida de paquetes.", "Puerto sin link; velocidad incorrecta; tráfico inestable.", false),
-                row("Prueba de LEDs", "Valida LEDs de power, UID, NIC, fan, PSU y fault.", "LED apagado; LED incorrecto; intermitencia por firmware.", false),
-                row("Prueba de fuentes de poder / PDU", "Valida energía, voltaje y estado de PSU/PDU.", "PSU no detectada; redundancia fallida; apagado por carga.", true),
-                row("Prueba de fans", "Valida RPM, PWM, redundancia y respuesta térmica.", "Fan no gira; RPM fuera de rango; fan al 100%.", true),
-                row("Prueba térmica / cuarto frío / burn-in", "Valida estabilidad prolongada bajo carga y temperatura.", "Sobrecalentamiento; throttling; apagado térmico.", true),
-                row("Stress Test General", "Valida CPU, RAM, disco y red trabajando juntos.", "Kernel panic; reinicio inesperado; error intermitente.", true),
-                row("Prueba de inventario HW", "Valida conteo de CPUs, RAM, discos, NICs, PSUs, fans y seriales.", "Componente faltante; FRU incorrecto; no coincide BOM.", false),
-                row("Prueba de puertos USB", "Valida puertos USB, especialmente para instalaciones R10.", "USB no bootea; desconexiones; velocidad incorrecta.", false),
-                row("Logs SEL / Event Log", "Valida errores registrados por BMC/BIOS durante prueba.", "Logs críticos; falsos positivos; SEL lleno o inaccesible.", true)
+                row("Operating System Installation", "Validates that the server can boot and install the base OS image.", "Disk or USB not detected; BIOS/UEFI boot misconfiguration; corrupted image.", true),
+                row("POST / Power On Self Test", "Validates motherboard, CPU, RAM, BIOS and peripheral initialization.", "No video or POST; memory error code; reboot during initialization.", true),
+                row("BMC / IPMI / Redfish", "Validates remote management sensors, logs, power control and inventory.", "BMC not responding over network; incorrect sensor values; corrupted firmware.", true),
+                row("BIOS / Firmware Check", "Validates BIOS, BMC, CPLD, NIC and RAID firmware baseline.", "Incorrect firmware version; failed update; BIOS-BMC compatibility issue.", true),
+                row("Memory Validation Test", "Validates DIMM stability under intensive read/write operations.", "DIMM not detected; ECC errors; uncorrectable error or thermal trip.", true),
+                row("CPU Stress Test", "Validates CPU load, cores, frequency, temperature and stability.", "CPU not detected; thermal throttling; crash under stress.", true),
+                row("Storage Validation Test", "Validates SSD, HDD, NVMe, RAID, SMART health and throughput.", "Drive not detected; SMART errors; low throughput from slot, cable or backplane.", true),
+                row("Ethernet Network Test", "Validates link, speed, traffic stability, packet loss and throughput.", "Ethernet port without link; incorrect negotiated speed; packet loss.", false),
+                row("LED Indicator Test", "Validates power, UID, NIC, fan, PSU, fault and status indicators.", "LED not turning on; incorrect LED state; intermittent GPIO or firmware behavior.", false),
+                row("Power Supply / PDU Test", "Validates PSU input, voltage reporting, redundancy and PDU state.", "PSU not detected; redundancy failure; shutdown during PDU or load transition.", true),
+                row("Fan Validation Test", "Validates fan RPM, PWM control, redundancy and thermal response.", "Fan not spinning; RPM out of range; fan locked at 100%.", true),
+                row("Thermal / Burn-In Test", "Validates long-duration stability under load and thermal control.", "Overheating; thermal throttling; protective thermal shutdown.", true),
+                row("General Stress Test", "Validates CPU, RAM, disk and network under combined workload.", "Kernel panic; unexpected reboot; intermittent failure.", true),
+                row("Hardware Inventory Validation", "Validates expected CPUs, RAM, drives, NICs, PSUs, fans and serials.", "Missing component; incorrect serial or FRU; BOM mismatch.", false),
+                row("USB Port Test", "Validates USB boot and stability for server installation paths.", "USB does not boot; intermittent disconnects; incorrect USB speed.", false),
+                row("SEL / Event Log Review", "Validates BMC/BIOS event logs recorded during validation.", "Critical log events; false positives; SEL log full or inaccessible.", true)
         );
         tests.forEach(data -> {
-            if (!testCatalogRepository.existsByName(data[0])) {
-                TestCatalog test = new TestCatalog();
-                test.setName(data[0]);
-                test.setValidates(data[1]);
-                test.setPossibleFailures(data[2]);
-                test.setCritical(Boolean.parseBoolean(data[3]));
-                testCatalogRepository.save(test);
-            }
+            TestCatalog test = testCatalogRepository.findAll().stream()
+                    .filter(existing -> existing.getName().equals(data[0]) || legacyTestName(existing.getName()).equals(data[0]))
+                    .findFirst()
+                    .orElseGet(TestCatalog::new);
+            test.setName(data[0]);
+            test.setValidates(data[1]);
+            test.setPossibleFailures(data[2]);
+            test.setCritical(Boolean.parseBoolean(data[3]));
+            testCatalogRepository.save(test);
         });
     }
 
     private String[] row(String name, String validates, String failures, boolean critical) {
         return new String[]{name, validates, failures, String.valueOf(critical)};
+    }
+
+    private String legacyTestName(String name) {
+        return switch (name) {
+            case "Instalación de sistema operativo" -> "Operating System Installation";
+            case "Prueba de memoria RAM" -> "Memory Validation Test";
+            case "Prueba de CPU" -> "CPU Stress Test";
+            case "Prueba de almacenamiento" -> "Storage Validation Test";
+            case "Prueba de red Ethernet" -> "Ethernet Network Test";
+            case "Prueba de LEDs" -> "LED Indicator Test";
+            case "Prueba de fuentes de poder / PDU" -> "Power Supply / PDU Test";
+            case "Prueba de fans" -> "Fan Validation Test";
+            case "Prueba térmica / cuarto frío / burn-in" -> "Thermal / Burn-In Test";
+            case "Stress Test General" -> "General Stress Test";
+            case "Prueba de inventario HW" -> "Hardware Inventory Validation";
+            case "Prueba de puertos USB" -> "USB Port Test";
+            case "Logs SEL / Event Log" -> "SEL / Event Log Review";
+            default -> name;
+        };
     }
 
     private void seedServersAndFailures() {
@@ -152,11 +174,11 @@ public class DataSeeder implements CommandLineRunner {
         ProductionServer s5 = createServer("PMS-005", "SRV-R9-BURNIN-005", ServerModel.R9, ServerStatus.RETEST, "B02", "Burn-In Chamber 02", engineer, burnInTech);
         ProductionServer s6 = createServer("PMS-006", "SRV-R10-DEBUG-006", ServerModel.R10, ServerStatus.DEBUG, "DBG-01", "Debug Bench GDL", quality, tech);
 
-        TestCatalog memory = findTest("memoria");
+        TestCatalog memory = findTest("Memory");
         TestCatalog ethernet = findTest("Ethernet");
         TestCatalog bmc = findTest("BMC");
-        TestCatalog storage = findTest("almacenamiento");
-        TestCatalog thermal = findTest("burn-in");
+        TestCatalog storage = findTest("Storage");
+        TestCatalog thermal = findTest("Burn-In");
         TestCatalog pdu = findTest("PDU");
         TestCatalog sel = findTest("SEL");
 
@@ -180,6 +202,64 @@ public class DataSeeder implements CommandLineRunner {
         createFailure(s3, storage, "NVMe drive not detected in slot 2 during inventory validation.", Severity.MEDIUM, FailureStatus.CLOSED, burnInTech, "Reseated NVMe drive and confirmed detection after cold boot.", 24);
         createFailure(s5, thermal, "Thermal throttling during burn-in after 42 minutes of sustained load.", Severity.CRITICAL, FailureStatus.OPEN, burnInTech, "Inspect fan profile, verify heatsink torque, and repeat burn-in cycle.", 3);
         createFailure(s6, sel, "SEL log full or inaccessible from BMC event log interface.", Severity.LOW, FailureStatus.FIXED, tech, "Cleared SEL log and confirmed event log access through IPMI.", 1);
+        updateLegacyFailureText();
+    }
+
+    /**
+     * Crea registros iniciales para que la matriz de trazabilidad muestre datos reales al abrir la pantalla.
+     */
+    private void seedTraceabilityRecords() {
+        User engineer = userRepository.findByEmail("engineer@pms.local").orElseThrow();
+        User manufacturing = userRepository.findByEmail("manufacturing.engineer@pms.local").orElse(engineer);
+        User quality = userRepository.findByEmail("quality.engineer@pms.local").orElse(engineer);
+        User tech = userRepository.findByEmail("technician@pms.local").orElseThrow();
+        User burnInTech = userRepository.findByEmail("burnin.tech@pms.local").orElse(tech);
+
+        ProductionServer s1 = serverRepository.findBySerialNumber("FXGDL-R9-240521-001").orElseThrow();
+        ProductionServer s2 = serverRepository.findBySerialNumber("FXGDL-R10-240521-002").orElseThrow();
+        ProductionServer s3 = serverRepository.findBySerialNumber("HPE-R9-240521-003").orElseThrow();
+        ProductionServer s4 = serverRepository.findBySerialNumber("DELL-R10-240521-004").orElseThrow();
+        ProductionServer s5 = serverRepository.findBySerialNumber("SRV-R9-BURNIN-005").orElseThrow();
+        ProductionServer s6 = serverRepository.findBySerialNumber("SRV-R10-DEBUG-006").orElseThrow();
+
+        Pdu pduA01 = findPdu("PDU-GDL-CR1-A01");
+        Pdu pduA02 = findPdu("PDU-GDL-CR1-A02");
+        Pdu pduB01 = findPdu("PDU-GDL-CR2-B01");
+        RaspberryDevice rpiOs = findRaspberry("RPI-GDL-A01-OSLOAD");
+        RaspberryDevice rpiBurnIn = findRaspberry("RPI-GDL-A02-BURNIN");
+        RaspberryDevice rpiDebug = findRaspberry("RPI-GDL-B01-DEBUG");
+
+        TestCatalog bmc = findTest("BMC");
+        TestCatalog memory = findTest("Memory");
+        TestCatalog ethernet = findTest("Ethernet");
+        TestCatalog thermal = findTest("burn-in");
+        TestCatalog sel = findTest("SEL");
+        TestCatalog pdu = findTest("PDU");
+
+        createTraceability(s1, rpiOs, pduA01, "A01-03", "Cold Room GDL-01", "Rack A01 / Slot 03", ethernet, TestStatus.PASSED,
+                "Ethernet validation passed with stable 10Gb link and no packet loss.", null, null,
+                "Validated switch link, speed negotiation and traffic stability.", engineer, tech, 8);
+        createTraceability(s2, rpiOs, pduA02, "A02-05", "Cold Room GDL-01", "Rack A02 / Slot 05", memory, TestStatus.FAILED,
+                "Memory stress failed after ECC correctable errors were detected.", "RAM ECC correctable errors on DIMM B1", Severity.HIGH,
+                "Reseat DIMM B1, run diagnostics and repeat memory stress.", manufacturing, tech, 6);
+        createTraceability(s3, rpiBurnIn, pduA01, "A01-08", "Cold Room GDL-01", "Rack A03 / Slot 08", bmc, TestStatus.PASSED,
+                "BMC responded over Redfish and IPMI. Sensor inventory collected successfully.", null, null,
+                "Confirmed management network, sensor readings and remote power control.", quality, burnInTech, 5);
+        createTraceability(s4, rpiBurnIn, pduB01, "B01-02", "Cold Room GDL-02", "Rack B01 / Slot 02", pdu, TestStatus.PASSED,
+                "PSU and PDU redundancy checks passed during controlled load switch.", null, null,
+                "Validated PSU status, redundancy and outlet telemetry.", manufacturing, burnInTech, 4);
+        createTraceability(s5, rpiBurnIn, pduB01, "B01-06", "Burn-In Chamber 02", "Rack B02 / Burn-In Slot 06", thermal, TestStatus.RETEST,
+                "Thermal margin degraded under sustained CPU load during burn-in.", "Thermal throttling during burn-in", Severity.CRITICAL,
+                "Inspect heatsink torque, fan profile and repeat burn-in cycle.", engineer, burnInTech, 3);
+        createTraceability(s6, rpiDebug, pduB01, "B01-09", "Debug Bench GDL", "Debug Bench DBG-01", bmc, TestStatus.FAILED,
+                "BMC did not respond over management VLAN during Redfish health check.", "BMC not responding over network", Severity.HIGH,
+                "Reset BMC, verify VLAN assignment and update firmware if required.", quality, tech, 2);
+        createTraceability(s6, rpiDebug, pduB01, "B01-10", "Debug Bench GDL", "Debug Bench DBG-01", pdu, TestStatus.FAILED,
+                "Server lost redundancy when load was switched to secondary PDU outlet.", "PSU redundancy failure", Severity.CRITICAL,
+                "Validate PSU seating, inspect PDU outlet current and rerun redundancy test.", quality, tech, 1);
+        createTraceability(s6, rpiDebug, pduB01, "B01-10", "Debug Bench GDL", "Debug Bench DBG-01", sel, TestStatus.FAILED,
+                "SEL log could not be read from BMC event log interface.", "SEL log full or inaccessible", Severity.LOW,
+                "Clear SEL log and confirm event log access through IPMI.", quality, tech, 1);
     }
 
     /**
@@ -190,6 +270,60 @@ public class DataSeeder implements CommandLineRunner {
                 .filter(test -> test.getName().toLowerCase().contains(keyword.toLowerCase()))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    /**
+     * Busca una PDU semilla por nombre para relacionarla con trazabilidad.
+     */
+    private Pdu findPdu(String name) {
+        return pduRepository.findAll().stream()
+                .filter(pdu -> pdu.getName().equals(name))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    /**
+     * Busca una Raspberry semilla por nombre para relacionarla con trazabilidad.
+     */
+    private RaspberryDevice findRaspberry(String name) {
+        return raspberryRepository.findAll().stream()
+                .filter(device -> device.getName().equals(name))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    /**
+     * Registra una línea de trazabilidad realista evitando duplicados al reiniciar la aplicación.
+     */
+    private void createTraceability(ProductionServer server, RaspberryDevice raspberry, Pdu pdu, String pduPort, String coldRoom,
+                                    String physicalLocation, TestCatalog test, TestStatus status, String result, String failure,
+                                    Severity severity, String correctiveAction, User engineer, User technician, int hoursAgo) {
+        boolean alreadyExists = traceabilityRepository.findAll().stream()
+                .anyMatch(record -> record.getServer().getSerialNumber().equals(server.getSerialNumber())
+                        && record.getTestCatalog().getName().equals(test.getName())
+                        && result.equals(record.getResult()));
+        if (alreadyExists) return;
+
+        TraceabilityRecord record = new TraceabilityRecord();
+        record.setServer(server);
+        record.setRaspberry(raspberry);
+        record.setPdu(pdu);
+        record.setPduPort(pduPort);
+        record.setColdRoom(coldRoom);
+        record.setPhysicalLocation(physicalLocation);
+        record.setTestCatalog(test);
+        record.setTestStatus(status);
+        record.setResult(result);
+        record.setDetectedFailure(failure);
+        record.setSeverity(severity);
+        record.setCorrectiveAction(correctiveAction);
+        record.setResponsibleEngineer(engineer);
+        record.setResponsibleTechnician(technician);
+        record.setStartDate(LocalDateTime.now().minusHours(hoursAgo + 1));
+        record.setEndDate(LocalDateTime.now().minusHours(hoursAgo));
+        record.setComments("Traceability record generated for manufacturing and validation flow.");
+        record.setEvidenceLogReference("logs/" + server.getSerialNumber() + "/" + test.getName().replace(" ", "_") + ".log");
+        traceabilityRepository.save(record);
     }
 
     /**
@@ -207,7 +341,17 @@ public class DataSeeder implements CommandLineRunner {
      * Crea un servidor semilla solo cuando el serial no existe.
      */
     private ProductionServer createServer(String internalId, String serial, ServerModel model, ServerStatus status, String rack, String location, User engineer, User tech) {
-        return serverRepository.findBySerialNumber(serial).orElseGet(() -> {
+        return serverRepository.findBySerialNumber(serial).map(existing -> {
+            existing.setInternalId(internalId);
+            existing.setModel(model);
+            existing.setRackNumber(rack);
+            existing.setLocation(location);
+            existing.setStatus(status);
+            existing.setResponsibleEngineer(engineer);
+            existing.setAssignedTechnician(tech);
+            existing.setObservations("Manufacturing validation unit assigned to server test flow.");
+            return serverRepository.save(existing);
+        }).orElseGet(() -> {
             ProductionServer server = server(internalId, serial, model, status, rack, location, engineer, tech);
             return serverRepository.save(server);
         });
@@ -231,7 +375,7 @@ public class DataSeeder implements CommandLineRunner {
         serverTest.setStartedAt(LocalDateTime.now().minusHours(hoursAgo + 1));
         serverTest.setFinishedAt(LocalDateTime.now().minusHours(hoursAgo));
         serverTest.setResult(result);
-        serverTest.setComments("Registro inicial de prueba para dashboard de manufactura.");
+        serverTest.setComments("Initial test record for the manufacturing dashboard.");
         serverTestRepository.save(serverTest);
     }
 
@@ -252,7 +396,7 @@ public class DataSeeder implements CommandLineRunner {
         failure.setAssignedTechnician(technician);
         failure.setDetectedAt(LocalDateTime.now().minusHours(hoursAgo));
         failure.setCorrectiveAction(correctiveAction);
-        failure.setComments("Evento detectado durante flujo de validación de servidor.");
+        failure.setComments("Event detected during the server validation flow.");
         failure.setEvidenceLog("logs/" + server.getSerialNumber() + "/" + catalog.getName().replace(" ", "_") + ".log");
         if (status == FailureStatus.CLOSED || status == FailureStatus.FIXED) {
             failure.setClosedAt(LocalDateTime.now().minusHours(Math.max(0, hoursAgo - 1)));
@@ -276,5 +420,20 @@ public class DataSeeder implements CommandLineRunner {
         server.setAssignedTechnician(tech);
         server.setObservations("Manufacturing validation unit assigned to server test flow.");
         return server;
+    }
+
+    private void updateLegacyFailureText() {
+        failureRepository.findAll().forEach(failure -> {
+            if (failure.getDescription() != null && failure.getDescription().contains("ECC")) {
+                failure.setDescription("RAM ECC correctable errors during memory stress.");
+            }
+            if (failure.getCorrectiveAction() != null && failure.getCorrectiveAction().contains("DIMM B1")) {
+                failure.setCorrectiveAction("Inspect DIMM B1 and repeat the memory validation test.");
+            }
+            if (failure.getComments() != null && failure.getComments().contains("validaci")) {
+                failure.setComments("Event detected during the server validation flow.");
+            }
+            failureRepository.save(failure);
+        });
     }
 }

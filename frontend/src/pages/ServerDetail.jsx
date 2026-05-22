@@ -10,7 +10,7 @@ export default function ServerDetail() {
 
   useEffect(() => { api.get(`/servers/${id}`).then((res) => setServer(res.data)); }, [id]);
 
-  if (!server) return <section className="page">Cargando servidor...</section>;
+  if (!server) return <section className="page">Loading server...</section>;
 
   return (
     <section className="page">
@@ -19,14 +19,14 @@ export default function ServerDetail() {
         <p>{server.internalId} · {server.model} · {server.location}</p>
       </div>
       <div className="detail-grid">
-        <div className="panel"><h2>Estado</h2><StatusBadge value={server.status} /></div>
+        <div className="panel"><h2>Status</h2><StatusBadge value={server.status} /></div>
         <div className="panel"><h2>Rack</h2><strong>{server.rackNumber || 'N/A'}</strong></div>
-        <div className="panel"><h2>Ingeniero</h2><strong>{server.responsibleEngineer?.fullName || 'Sin asignar'}</strong></div>
-        <div className="panel"><h2>Técnico</h2><strong>{server.assignedTechnician?.fullName || 'Sin asignar'}</strong></div>
+        <div className="panel"><h2>Engineer</h2><strong>{server.responsibleEngineer?.fullName || 'Unassigned'}</strong></div>
+        <div className="panel"><h2>Technician</h2><strong>{server.assignedTechnician?.fullName || 'Unassigned'}</strong></div>
       </div>
       <div className="panel">
-        <h2>Observaciones</h2>
-        <p>{server.observations || 'Sin observaciones.'}</p>
+        <h2>Notes</h2>
+        <p>{server.observations || 'No notes available.'}</p>
       </div>
     </section>
   );

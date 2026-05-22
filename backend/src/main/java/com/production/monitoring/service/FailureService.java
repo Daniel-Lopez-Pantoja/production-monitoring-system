@@ -33,8 +33,8 @@ public class FailureService {
      */
     public Failure create(FailureRequest request) {
         Failure failure = new Failure();
-        failure.setServer(serverRepository.findById(request.serverId()).orElseThrow(() -> new ResourceNotFoundException("Servidor no encontrado.")));
-        failure.setTestCatalog(testCatalogRepository.findById(request.testCatalogId()).orElseThrow(() -> new ResourceNotFoundException("Prueba no encontrada.")));
+        failure.setServer(serverRepository.findById(request.serverId()).orElseThrow(() -> new ResourceNotFoundException("Server not found.")));
+        failure.setTestCatalog(testCatalogRepository.findById(request.testCatalogId()).orElseThrow(() -> new ResourceNotFoundException("Test not found.")));
         failure.setDescription(request.description());
         failure.setSeverity(request.severity());
         failure.setStatus(request.status());

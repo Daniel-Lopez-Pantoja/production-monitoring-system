@@ -15,6 +15,6 @@ public class OpenApiConfig {
         return new OpenAPI().info(new Info()
                 .title("Production Monitoring System API")
                 .version("1.0.0")
-                .description("API para trazabilidad, pruebas y fallas de servidores en manufactura."));
+                .description("API for server traceability, validation workflows and manufacturing quality monitoring."));
     }
 }
