@@ -5,6 +5,7 @@ import com.production.monitoring.model.enums.*;
 import com.production.monitoring.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -27,14 +28,25 @@ public class DataSeeder implements CommandLineRunner {
     private final ServerTestRepository serverTestRepository;
     private final TraceabilityRecordRepository traceabilityRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) {
+        normalizeRoleColumns();
         seedUsers();
         seedDevices();
         seedTests();
         seedServersAndFailures();
         seedTraceabilityRecords();
+    }
+
+    /**
+     * Convierte columnas legacy MySQL ENUM a VARCHAR para permitir roles nuevos como DEMO_USER.
+     * Esto protege bases locales o despliegues Railway creados antes de agregar el usuario demo.
+     */
+    private void normalizeRoleColumns() {
+        jdbcTemplate.execute("ALTER TABLE roles MODIFY COLUMN name VARCHAR(50) NOT NULL");
+        jdbcTemplate.execute("ALTER TABLE users MODIFY COLUMN role VARCHAR(50) NOT NULL");
     }
 
     private void seedUsers() {
@@ -46,13 +58,14 @@ public class DataSeeder implements CommandLineRunner {
                 roleRepository.save(role);
             }
         }
-        createUser("Daniel Lopez", "admin@pms.local", "admin123", UserRole.ADMIN);
+        createUser("Daniel Lopez", "admin@pms.local", "admin#123", UserRole.ADMIN);
         createUser("Test Engineer", "engineer@pms.local", "engineer123", UserRole.ENGINEER);
         createUser("Debug Technician", "technician@pms.local", "tech123", UserRole.TECHNICIAN);
         createUser("Line Operator", "operator@pms.local", "operator123", UserRole.OPERATOR);
         createUser("Manufacturing Engineer", "manufacturing.engineer@pms.local", "engineer123", UserRole.ENGINEER);
         createUser("Quality Engineer", "quality.engineer@pms.local", "engineer123", UserRole.ENGINEER);
         createUser("Burn-In Technician", "burnin.tech@pms.local", "tech123", UserRole.TECHNICIAN);
+        createUser("Portfolio Demo User", "demo@pms.local", "demo123", UserRole.DEMO_USER);
     }
 
     private void createUser(String name, String email, String password, UserRole role) {

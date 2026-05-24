@@ -15,10 +15,6 @@ export function AuthProvider({ children }) {
       password,
     });
 
-    /**
-     * El backend devuelve únicamente el JWT como string.
-     * Si en el futuro devuelve un objeto, también será compatible.
-     */
     const token =
       typeof data === 'string'
         ? data
@@ -26,9 +22,11 @@ export function AuthProvider({ children }) {
 
     localStorage.setItem('pms_token', token);
 
-    // Guardamos información básica del usuario autenticado.
+    // Guardamos rol y nombre para aplicar restricciones visuales al DEMO_USER en la demo pública.
     const userData = {
-      email,
+      email: typeof data === 'string' ? email : data.email,
+      fullName: typeof data === 'string' ? email : data.fullName,
+      role: typeof data === 'string' ? undefined : data.role,
     };
 
     localStorage.setItem('pms_user', JSON.stringify(userData));

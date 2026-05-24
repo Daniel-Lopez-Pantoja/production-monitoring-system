@@ -13,8 +13,8 @@ const benefits = [
 // Pantalla de inicio de sesión contra el endpoint /api/auth/login.
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
-  const [email, setEmail] = useState('admin@pms.local');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('demo@pms.local');
+  const [password, setPassword] = useState('demo123');
   const [error, setError] = useState('');
 
   async function handleSubmit(event) {
@@ -65,8 +65,9 @@ export default function Login() {
 
           <div className="demo-credentials">
             <strong>Demo credentials</strong>
-            <span>Email: admin@pms.local</span>
-            <span>Password: admin123</span>
+            <span>Email: demo@pms.local</span>
+            <span>Password: demo123</span>
+            <span>Demo user has restricted permissions for portfolio review.</span>
           </div>
         </form>
       </div>

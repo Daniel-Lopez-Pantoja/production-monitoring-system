@@ -17,6 +17,8 @@ const links = [
 export default function Layout() {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const isDemoUser = user?.role === 'DEMO_USER';
+  const visibleLinks = links.filter(([to]) => !(isDemoUser && to === '/users'));
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -28,7 +30,7 @@ export default function Layout() {
           </div>
         </div>
         <nav>
-          {links.map(([to, label, Icon]) => (
+          {visibleLinks.map(([to, label, Icon]) => (
             <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => isActive ? 'active nav-item' : 'nav-item'}>
               <Icon size={18} /> {label}
             </NavLink>

@@ -89,6 +89,8 @@ tbody tr:hover { background: color-mix(in srgb, var(--panel) 88%, var(--brand));
 .status-list div { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding: 10px 0; }
 .primary-link, button { border: 0; background: var(--brand); color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 700; }
 button:hover, .primary-link:hover { background: var(--brand-dark); }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+button:disabled:hover { background: var(--brand); }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: white; border: 1px solid var(--line); border-radius: 8px; padding: 20px; }
 label { display: grid; gap: 7px; color: var(--muted); font-size: 13px; font-weight: 700; }
 input, select, textarea { border: 1px solid var(--line); border-radius: 8px; padding: 11px 12px; color: var(--text); background: white; }

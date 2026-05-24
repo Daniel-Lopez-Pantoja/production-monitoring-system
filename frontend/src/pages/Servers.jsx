@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { buildSearchIndex, matchesSearch } from '../utils/search.js';
 
 // Construye el índice de búsqueda de servidores normalizando estados enum como READY_FOR_TEST.
@@ -25,6 +26,8 @@ function buildServerSearchIndex(server) {
 export default function Servers() {
   const [servers, setServers] = useState([]);
   const [query, setQuery] = useState('');
+  const { user } = useAuth();
+  const isDemoUser = user?.role === 'DEMO_USER';
 
   useEffect(() => { api.get('/servers').then((res) => setServers(res.data)); }, []);
 
@@ -34,7 +37,7 @@ export default function Servers() {
     <section className="page">
       <div className="page-title row">
         <div><h1>Server Management</h1><p>Registration and lifecycle tracking for R9, R10 and additional validation units.</p></div>
-        <Link className="primary-link" to="/servers/new">New Server</Link>
+        {!isDemoUser && <Link className="primary-link" to="/servers/new">New Server</Link>}
       </div>
       <input className="search" placeholder="Search by serial, model, status, engineer or technician..." value={query} onChange={(e) => setQuery(e.target.value)} />
       <div className="panel table-panel">

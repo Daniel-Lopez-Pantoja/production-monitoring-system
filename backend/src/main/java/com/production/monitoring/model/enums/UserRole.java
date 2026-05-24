@@ -7,5 +7,6 @@ public enum UserRole {
     ADMIN,
     ENGINEER,
     TECHNICIAN,
-    OPERATOR
+    OPERATOR,
+    DEMO_USER
 }
