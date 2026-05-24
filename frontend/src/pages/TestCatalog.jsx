@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Activity, ChevronDown, ChevronRight, Cpu, HardDrive, MemoryStick, Network, Power, Search, Thermometer, Wrench } from 'lucide-react';
 import api from '../api/api';
+import { buildSearchIndex, matchesSearch, normalizeSearchText } from '../utils/search.js';
 
 const filters = ['All', 'Critical', 'Standard', 'Hardware', 'Firmware', 'Network', 'Thermal', 'Power', 'Storage'];
 
@@ -59,11 +60,11 @@ export default function TestCatalog() {
   const enrichedTests = useMemo(() => tests.map((test) => ({ ...test, display: getDisplayTest(test), meta: getTestMetadata(test) })), [tests]);
 
   const filteredTests = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = normalizeSearchText(query);
     return enrichedTests.filter((test) => {
       const badge = test.critical ? 'critical' : 'standard';
-      const searchable = [test.display.name, test.display.validates, test.display.possibleFailures, test.meta.category, test.meta.components, badge].join(' ').toLowerCase();
-      const matchesQuery = !normalizedQuery || searchable.includes(normalizedQuery);
+      const searchable = buildSearchIndex([test.display.name, test.display.validates, test.display.possibleFailures, test.meta.category, test.meta.components, badge]);
+      const matchesQuery = matchesSearch(searchable, normalizedQuery);
       const matchesFilter = activeFilter === 'All'
         || (activeFilter === 'Critical' && test.critical)
         || (activeFilter === 'Standard' && !test.critical)

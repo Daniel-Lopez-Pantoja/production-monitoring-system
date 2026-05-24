@@ -2,6 +2,24 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
+import { buildSearchIndex, matchesSearch } from '../utils/search.js';
+
+// Construye el índice de búsqueda de servidores normalizando estados enum como READY_FOR_TEST.
+function buildServerSearchIndex(server) {
+  return buildSearchIndex([
+    server.internalId,
+    server.serialNumber,
+    server.model,
+    server.rackNumber,
+    server.location,
+    server.status,
+    server.responsibleEngineer?.fullName,
+    server.assignedTechnician?.fullName,
+    server.observations,
+    server.entryDate,
+    server.updatedAt
+  ]);
+}
 
 // Lista de servidores con búsqueda por serial, modelo, estado, ingeniero o técnico.
 export default function Servers() {
@@ -10,7 +28,7 @@ export default function Servers() {
 
   useEffect(() => { api.get('/servers').then((res) => setServers(res.data)); }, []);
 
-  const filtered = useMemo(() => servers.filter((server) => JSON.stringify(server).toLowerCase().includes(query.toLowerCase())), [servers, query]);
+  const filtered = useMemo(() => servers.filter((server) => matchesSearch(buildServerSearchIndex(server), query)), [servers, query]);
 
   return (
     <section className="page">

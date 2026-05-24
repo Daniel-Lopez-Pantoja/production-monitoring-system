@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
+import { buildSearchIndex, matchesSearch, normalizeSearchText } from '../utils/search.js';
 
 // Da formato legible a las fechas de trazabilidad sin ocupar demasiado espacio en la tabla.
 function formatTraceDate(value) {
@@ -16,7 +17,7 @@ function formatTraceDate(value) {
 
 // Une los campos importantes de un registro para permitir búsqueda operacional por serial, rack, PDU, prueba, falla o responsable.
 function buildSearchText(record) {
-  return [
+  return buildSearchIndex([
     record.server?.serialNumber,
     record.server?.model,
     record.server?.rackNumber,
@@ -37,7 +38,7 @@ function buildSearchText(record) {
     record.endDate,
     record.createdAt,
     record.updatedAt
-  ].filter(Boolean).join(' ').toLowerCase();
+  ]);
 }
 
 // Matriz de trazabilidad con carga, error, estado vacío y búsqueda por campos técnicos clave.
@@ -55,9 +56,9 @@ export default function Traceability() {
   }, []);
 
   const filtered = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = normalizeSearchText(query);
     if (!normalizedQuery) return records;
-    return records.filter((record) => buildSearchText(record).includes(normalizedQuery));
+    return records.filter((record) => matchesSearch(buildSearchText(record), normalizedQuery));
   }, [records, query]);
 
   return (
