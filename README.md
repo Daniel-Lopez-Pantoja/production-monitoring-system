@@ -60,6 +60,14 @@ The frontend consumes secured REST endpoints exposed by the Spring Boot backend.
 - Live Demo: Coming soon
 - API Demo: Coming soon
 
+## Public Demo Safety
+
+The public portfolio demo uses a restricted `DEMO_USER` account. This user can browse dashboards, reports, traceability, server data, failures, test catalog entries, and demo records, but cannot perform administrative or destructive actions.
+
+Admin, engineer, technician, and operator credentials are not published for security reasons. The public demo account provides read-only/restricted access for portfolio review while protecting demo data from destructive changes.
+
+Sensitive values such as production database credentials and JWT secrets must be configured through deployment provider environment variables, not committed to GitHub. The values in `.env.example` are placeholders for local development only.
+
 ## Technologies
 
 **Backend**
@@ -110,10 +118,9 @@ The frontend consumes secured REST endpoints exposed by the Spring Boot backend.
 
 | Role | Email | Password |
 | --- | --- | --- |
-| ADMIN | `admin@pms.local` | `admin123` |
-| ENGINEER | `engineer@pms.local` | `engineer123` |
-| TECHNICIAN | `technician@pms.local` | `tech123` |
-| OPERATOR | `operator@pms.local` | `operator123` |
+| DEMO_USER | `demo@pms.local` | `demo123` |
+
+This account is intended for portfolio review only and has restricted permissions to protect demo data.
 
 ## Getting Started
 
@@ -151,8 +158,19 @@ Supported backend environment variables:
 DB_URL=jdbc:mysql://localhost:3306/production_monitoring?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
 DB_USERNAME=root
 DB_PASSWORD=root
-JWT_SECRET=ProductionMonitoringSystemSecretKeyForJwtMustBeLongEnough2026
+JWT_SECRET=change-this-demo-jwt-secret-before-deployment-please
 JWT_EXPIRATION_MS=86400000
+```
+
+### Existing Database Migration Note
+
+If your local MySQL database was created before the `DEMO_USER` role was added, restart the backend after pulling the latest code. On startup, the application converts legacy role columns to `VARCHAR(50)` so new portfolio-safe roles can be inserted without MySQL enum truncation.
+
+For a manual migration, run:
+
+```sql
+ALTER TABLE roles MODIFY COLUMN name VARCHAR(50) NOT NULL;
+ALTER TABLE users MODIFY COLUMN role VARCHAR(50) NOT NULL;
 ```
 
 ### 4. Run the Frontend
@@ -174,11 +192,11 @@ VITE_API_URL=http://localhost:8080/api
 
 ### 5. Log In
 
-Use the demo `ADMIN` account:
+Use the restricted demo account for portfolio review:
 
 ```text
-Email: admin@pms.local
-Password: admin123
+Email: demo@pms.local
+Password: demo123
 ```
 
 ## API Documentation
@@ -200,7 +218,7 @@ docs/postman_collection.json
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | POST | `/api/auth/login` | Authenticates a user and returns a JWT |
-| POST | `/api/auth/register` | Registers a new user |
+| POST | `/api/auth/register` | Registers a new user using an ADMIN account |
 | GET | `/api/servers` | Retrieves all registered servers |
 | POST | `/api/servers` | Creates a new server record |
 | GET | `/api/servers/{id}` | Retrieves a server by ID |
