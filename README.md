@@ -1,14 +1,64 @@
 # Production Monitoring System
 
-Full Stack enterprise-oriented application for monitoring servers across manufacturing, laboratory, and test engineering environments. The system is designed as an internal production tracking platform for Test Engineering teams, providing serial-level traceability, lifecycle state management, test execution tracking, failure registration, corrective actions, evidence references, and operational reporting.
+Enterprise-style Full Stack platform for manufacturing server validation, production monitoring, traceability, failure management, and Test Engineering workflows.
 
-**Author:** Juan Daniel López Pantoja
+This project simulates an internal manufacturing system used to track R9/R10 server units through operating system installation, hardware validation, burn-in, debugging, retest, release readiness, and production handoff.
 
-## Objective
+## Project Overview
 
-Build a professional foundation for an enterprise production monitoring system focused on R9/R10 server validation, functional testing workflows, failure management, technical evidence, corrective actions, and controlled server release processes.
+Production Monitoring System is a portfolio-grade application designed around a real manufacturing and server validation domain. It provides a centralized platform for Test Engineering teams to manage server lifecycle status, execute validation tests, register failures, document corrective actions, maintain serial-level traceability, and monitor production readiness through an enterprise dashboard.
 
-This project is intended to demonstrate Java Backend Development skills in a real-world business domain, including layered architecture, REST API design, JWT-based security, relational data modeling, validation rules, and a React-based operational dashboard.
+The project demonstrates backend engineering, REST API design, relational modeling, authentication, business rules, and a React-based operational UI in a domain that goes beyond a generic CRUD application.
+
+## Business Context
+
+Manufacturing and Test Engineering teams need reliable visibility into server units moving through validation. Without a centralized system, teams often rely on spreadsheets, manual updates, scattered logs, and inconsistent communication between engineers, technicians, quality teams, and operators.
+
+This system addresses that problem by supporting:
+
+- Server lifecycle tracking from intake to release.
+- Validation test execution and result tracking.
+- Failure registration with severity, status, evidence, and corrective actions.
+- Serial-level traceability across server, rack, PDU, Raspberry device, test, technician, and engineer.
+- Production readiness visibility through dashboards, metrics, and reports.
+
+## Why This Project Matters
+
+This project demonstrates software development applied to a realistic manufacturing and testing workflow. Instead of presenting a generic CRUD app, it models business rules, traceability requirements, validation states, operational metrics, and failure workflows found in enterprise production environments.
+
+It is especially relevant for Java Backend, Full Stack, Enterprise Software, Manufacturing Systems, QA Automation, and Test Engineering support roles.
+
+## Portfolio Highlights
+
+- Java 17 Spring Boot REST API with layered architecture.
+- JWT authentication and role-based access control.
+- MySQL relational data model with JPA entities and repositories.
+- React enterprise dashboard with dark mode support.
+- Traceability matrix for serial-level validation history.
+- Failure management module with severity, status, and corrective action tracking.
+- Analytics and reporting views with CSV export support.
+- Swagger/OpenAPI documentation for API exploration.
+- Docker Compose setup for local MySQL development.
+- Postman collection for API testing.
+
+## Architecture
+
+```text
+React Frontend
+      ↓
+REST API
+      ↓
+Spring Boot Backend
+      ↓
+MySQL Database
+```
+
+The frontend consumes secured REST endpoints exposed by the Spring Boot backend. The backend handles authentication, business validation, persistence, seed data, reporting metrics, and operational workflows.
+
+## Live Demo
+
+- Live Demo: Coming soon
+- API Demo: Coming soon
 
 ## Technologies
 
@@ -28,6 +78,7 @@ This project is intended to demonstrate Java Backend Development skills in a rea
 - JavaScript
 - React Router
 - Axios
+- Recharts
 - HTML/CSS
 - Lucide React
 
@@ -36,25 +87,26 @@ This project is intended to demonstrate Java Backend Development skills in a rea
 - Postman Collection located at `docs/postman_collection.json`
 - `.env.example` for environment configuration
 
-## Features
+## Core Features
 
-- Authentication and user registration using JWT.
+- JWT-based authentication and user registration.
 - Role-based access model: `ADMIN`, `ENGINEER`, `TECHNICIAN`, `OPERATOR`.
-- Server asset management for production and test environments.
-- Traceability matrix for complete server and test history.
-- Initial test catalog with 16 manufacturing and validation test cases.
-- Failure tracking with severity, status, corrective action, comments, and evidence references.
+- Server management for manufacturing and validation environments.
+- Test catalog with manufacturing validation workflows.
+- Server test execution tracking.
+- Traceability matrix with rack, PDU, Raspberry, engineer, technician, status, result, and evidence fields.
+- Failure management with severity, lifecycle status, corrective actions, comments, and log references.
+- Dashboard with production overview, failure metrics, test metrics, charts, recent activity, and recent failures.
+- Reports and analytics for server status, failures by test, failures by model, throughput, and release readiness.
+- Search and filtering across operational modules.
 - Business rule validation:
   - Required and unique server serial number.
   - Unique internal server ID.
   - Prevents server release when open failures exist.
   - Prevents server release when critical tests have failed.
-- Dashboard with key production and test metrics.
-- Text-based filtering across operational tables.
-- Aggregated reports with CSV export from the frontend.
-- Seed data for users, roles, tests, servers, PDUs, Raspberry devices, server test results, and failures.
+- Seed data for users, roles, tests, servers, PDUs, Raspberry devices, test results, failures, and traceability records.
 
-## Initial Users
+## Demo Credentials
 
 | Role | Email | Password |
 | --- | --- | --- |
@@ -63,7 +115,16 @@ This project is intended to demonstrate Java Backend Development skills in a rea
 | TECHNICIAN | `technician@pms.local` | `tech123` |
 | OPERATOR | `operator@pms.local` | `operator123` |
 
-## Running MySQL
+## Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Daniel-Lopez-Pantoja/production-monitoring-system.git
+cd production-monitoring-system
+```
+
+### 2. Start MySQL with Docker
 
 ```bash
 docker compose up -d
@@ -71,18 +132,20 @@ docker compose up -d
 
 The database is created as `production_monitoring` using `root` as the username and `root` as the password.
 
-## Running the Backend
+### 3. Run the Backend
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-API:
+Backend API:
 - `http://localhost:8080/api`
-- Swagger: `http://localhost:8080/swagger-ui.html`
 
-Supported environment variables:
+Swagger/OpenAPI:
+- `http://localhost:8080/swagger-ui.html`
+
+Supported backend environment variables:
 
 ```env
 DB_URL=jdbc:mysql://localhost:3306/production_monitoring?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
@@ -92,7 +155,7 @@ JWT_SECRET=ProductionMonitoringSystemSecretKeyForJwtMustBeLongEnough2026
 JWT_EXPIRATION_MS=86400000
 ```
 
-## Running the Frontend
+### 4. Run the Frontend
 
 ```bash
 cd frontend
@@ -103,10 +166,33 @@ npm run dev
 Frontend:
 - `http://localhost:5173`
 
-Supported environment variable:
+Supported frontend environment variable:
 
 ```env
 VITE_API_URL=http://localhost:8080/api
+```
+
+### 5. Log In
+
+Use the demo `ADMIN` account:
+
+```text
+Email: admin@pms.local
+Password: admin123
+```
+
+## API Documentation
+
+Swagger UI is available after starting the backend:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+The Postman collection is available at:
+
+```text
+docs/postman_collection.json
 ```
 
 ## Main Endpoints
@@ -185,7 +271,7 @@ Production Monitoring System/
 ### Test Catalog
 ![Test Catalog](docs/images/test-catalog.png)
 
-### Reports
+### Reports & Analytics
 ![Reports](docs/images/reports-dashboard.png)
 
 ### Swagger API
@@ -193,10 +279,18 @@ Production Monitoring System/
 
 ## Future Improvements
 
-- Full create/edit workflows for all operational records from the frontend.
-- Unit and integration test coverage for services, controllers, and business rules.
-- Backend-driven CSV export for reports.
-- Authenticated user auditing for traceability and failure history.
+- Complete create/edit workflows for all operational frontend modules.
+- Unit, integration, and API test coverage for services, controllers, and business rules.
+- Backend-driven CSV and PDF report generation.
+- Audit trail by authenticated user for traceability and failure history.
 - Evidence and log file upload using external or cloud storage.
-- Advanced analytics by date range, server model, failure severity, and test category.
+- Advanced analytics by date range, server model, severity, test category, and production line.
 - CI/CD pipeline with GitHub Actions.
+- Deployment profile for cloud or containerized environments.
+- Role-specific dashboards for engineers, technicians, operators, and administrators.
+
+## Author
+
+Juan Daniel López Pantoja
+
+GitHub: [Daniel-Lopez-Pantoja](https://github.com/Daniel-Lopez-Pantoja)
