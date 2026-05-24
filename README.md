@@ -1,120 +1,31 @@
-# Production Monitoring System
+# Production Monitoring System (PMS)
+
+![Java](https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=20232A)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Railway](https://img.shields.io/badge/Railway-Backend%20%2B%20DB-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Frontend-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
 Enterprise-style Full Stack platform for manufacturing server validation, production monitoring, traceability, failure management, and Test Engineering workflows.
 
-This project simulates an internal manufacturing system used to track R9/R10 server units through operating system installation, hardware validation, burn-in, debugging, retest, release readiness, and production handoff.
+Production Monitoring System is inspired by real Test Engineering (TE) and manufacturing workflows used in high-volume server validation environments, including lifecycle tracking, traceability, corrective actions, and production monitoring.
 
-## Project Overview
+> Portfolio project focused on Java Backend Development, Full Stack Engineering, Manufacturing Systems, Test Engineering workflows, and enterprise REST API design.
 
-Production Monitoring System is a portfolio-grade application designed around a real manufacturing and server validation domain. It provides a centralized platform for Test Engineering teams to manage server lifecycle status, execute validation tests, register failures, document corrective actions, maintain serial-level traceability, and monitor production readiness through an enterprise dashboard.
-
-The project demonstrates backend engineering, REST API design, relational modeling, authentication, business rules, and a React-based operational UI in a domain that goes beyond a generic CRUD application.
-
-## Business Context
-
-Manufacturing and Test Engineering teams need reliable visibility into server units moving through validation. Without a centralized system, teams often rely on spreadsheets, manual updates, scattered logs, and inconsistent communication between engineers, technicians, quality teams, and operators.
-
-This system addresses that problem by supporting:
-
-- Server lifecycle tracking from intake to release.
-- Validation test execution and result tracking.
-- Failure registration with severity, status, evidence, and corrective actions.
-- Serial-level traceability across server, rack, PDU, Raspberry device, test, technician, and engineer.
-- Production readiness visibility through dashboards, metrics, and reports.
-
-## Why This Project Matters
-
-This project demonstrates software development applied to a realistic manufacturing and testing workflow. Instead of presenting a generic CRUD app, it models business rules, traceability requirements, validation states, operational metrics, and failure workflows found in enterprise production environments.
-
-It is especially relevant for Java Backend, Full Stack, Enterprise Software, Manufacturing Systems, QA Automation, and Test Engineering support roles.
-
-## Portfolio Highlights
-
-- Java 17 Spring Boot REST API with layered architecture.
-- JWT authentication and role-based access control.
-- MySQL relational data model with JPA entities and repositories.
-- React enterprise dashboard with dark mode support.
-- Traceability matrix for serial-level validation history.
-- Failure management module with severity, status, and corrective action tracking.
-- Analytics and reporting views with CSV export support.
-- Swagger/OpenAPI documentation for API exploration.
-- Docker Compose setup for local MySQL development.
-- Postman collection for API testing.
-
-## Architecture
-
-```text
-React Frontend
-      ↓
-REST API
-      ↓
-Spring Boot Backend
-      ↓
-MySQL Database
-```
-
-The frontend consumes secured REST endpoints exposed by the Spring Boot backend. The backend handles authentication, business validation, persistence, seed data, reporting metrics, and operational workflows.
+---
 
 ## Live Demo
 
-- Live Demo: Coming soon
-- API Demo: Coming soon
+| Resource | URL |
+| --- | --- |
+| Frontend App | `https://production-monitoring-system-gamma.vercel.app` |
+| Backend API Base URL | `https://production-monitoring-system-production.up.railway.app/api` |
+| Swagger UI | `https://production-monitoring-system-production.up.railway.app/swagger-ui/index.html` |
 
-## Public Demo Safety
-
-The public portfolio demo uses a restricted `DEMO_USER` account. This user can browse dashboards, reports, traceability, server data, failures, test catalog entries, and demo records, but cannot perform administrative or destructive actions.
-
-Admin, engineer, technician, and operator credentials are not published for security reasons. The public demo account provides read-only/restricted access for portfolio review while protecting demo data from destructive changes.
-
-Sensitive values such as production database credentials and JWT secrets must be configured through deployment provider environment variables, not committed to GitHub. The values in `.env.example` are placeholders for local development only.
-
-## Technologies
-
-**Backend**
-- Java 17
-- Spring Boot 3
-- Spring Web
-- Spring Data JPA
-- Spring Validation
-- Spring Security with JWT
-- MySQL
-- Maven
-- Swagger/OpenAPI
-
-**Frontend**
-- React
-- JavaScript
-- React Router
-- Axios
-- Recharts
-- HTML/CSS
-- Lucide React
-
-**Tools**
-- Docker Compose for MySQL
-- Postman Collection located at `docs/postman_collection.json`
-- `.env.example` for environment configuration
-
-## Core Features
-
-- JWT-based authentication and user registration.
-- Role-based access model: `ADMIN`, `ENGINEER`, `TECHNICIAN`, `OPERATOR`.
-- Server management for manufacturing and validation environments.
-- Test catalog with manufacturing validation workflows.
-- Server test execution tracking.
-- Traceability matrix with rack, PDU, Raspberry, engineer, technician, status, result, and evidence fields.
-- Failure management with severity, lifecycle status, corrective actions, comments, and log references.
-- Dashboard with production overview, failure metrics, test metrics, charts, recent activity, and recent failures.
-- Reports and analytics for server status, failures by test, failures by model, throughput, and release readiness.
-- Search and filtering across operational modules.
-- Business rule validation:
-  - Required and unique server serial number.
-  - Unique internal server ID.
-  - Prevents server release when open failures exist.
-  - Prevents server release when critical tests have failed.
-- Seed data for users, roles, tests, servers, PDUs, Raspberry devices, test results, failures, and traceability records.
-
-## Demo Credentials
+### Demo Credentials
 
 | Role | Email | Password |
 | --- | --- | --- |
@@ -122,160 +33,17 @@ Sensitive values such as production database credentials and JWT secrets must be
 
 This account is intended for portfolio review only and has restricted permissions to protect demo data.
 
-## Getting Started
+---
 
-### 1. Clone the Repository
+## Screenshots
 
-```bash
-git clone https://github.com/Daniel-Lopez-Pantoja/production-monitoring-system.git
-cd production-monitoring-system
-```
-
-### 2. Start MySQL with Docker
-
-```bash
-docker compose up -d
-```
-
-The database is created as `production_monitoring` using `root` as the username and `root` as the password.
-
-### 3. Run the Backend
-
-```bash
-cd backend
-mvn spring-boot:run
-```
-
-Backend API:
-- `http://localhost:8080/api`
-
-Swagger/OpenAPI:
-- `http://localhost:8080/swagger-ui.html`
-
-Supported backend environment variables:
-
-```env
-DB_URL=jdbc:mysql://localhost:3306/production_monitoring?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-DB_USERNAME=root
-DB_PASSWORD=root
-JWT_SECRET=change-this-demo-jwt-secret-before-deployment-please
-JWT_EXPIRATION_MS=86400000
-```
-
-### Existing Database Migration Note
-
-If your local MySQL database was created before the `DEMO_USER` role was added, restart the backend after pulling the latest code. On startup, the application converts legacy role columns to `VARCHAR(50)` so new portfolio-safe roles can be inserted without MySQL enum truncation.
-
-For a manual migration, run:
-
-```sql
-ALTER TABLE roles MODIFY COLUMN name VARCHAR(50) NOT NULL;
-ALTER TABLE users MODIFY COLUMN role VARCHAR(50) NOT NULL;
-```
-
-### 4. Run the Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend:
-- `http://localhost:5173`
-
-Supported frontend environment variable:
-
-```env
-VITE_API_URL=http://localhost:8080/api
-```
-
-### 5. Log In
-
-Use the restricted demo account for portfolio review:
-
-```text
-Email: demo@pms.local
-Password: demo123
-```
-
-## API Documentation
-
-Swagger UI is available after starting the backend:
-
-```text
-http://localhost:8080/swagger-ui.html
-```
-
-The Postman collection is available at:
-
-```text
-docs/postman_collection.json
-```
-
-## Main Endpoints
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| POST | `/api/auth/login` | Authenticates a user and returns a JWT |
-| POST | `/api/auth/register` | Registers a new user using an ADMIN account |
-| GET | `/api/servers` | Retrieves all registered servers |
-| POST | `/api/servers` | Creates a new server record |
-| GET | `/api/servers/{id}` | Retrieves a server by ID |
-| PUT | `/api/servers/{id}` | Updates an existing server |
-| DELETE | `/api/servers/{id}` | Deletes a server |
-| GET | `/api/tests` | Retrieves the test catalog |
-| GET | `/api/server-tests` | Retrieves server test execution results |
-| POST | `/api/server-tests` | Registers a server test result |
-| GET | `/api/traceability` | Retrieves the traceability matrix |
-| POST | `/api/traceability` | Creates a traceability record |
-| GET | `/api/failures` | Retrieves registered failures |
-| POST | `/api/failures` | Registers a new failure |
-| GET | `/api/dashboard` | Retrieves dashboard metrics |
-| GET | `/api/reports/servers-by-status` | Retrieves server counts grouped by status |
-| GET | `/api/reports/failures-by-test` | Retrieves failure counts grouped by test |
-| GET | `/api/reports/failures-by-model` | Retrieves failure counts grouped by server model |
-| GET | `/api/pdus` | Retrieves registered PDUs |
-| GET | `/api/raspberries` | Retrieves registered Raspberry devices |
-
-## Repository Structure
-
-```text
-Production Monitoring System/
-├── backend/
-│   ├── src/main/java/com/production/monitoring/
-│   │   ├── config/
-│   │   ├── controller/
-│   │   ├── dto/
-│   │   ├── exception/
-│   │   ├── mapper/
-│   │   ├── model/entity/
-│   │   ├── model/enums/
-│   │   ├── repository/
-│   │   ├── security/
-│   │   └── service/
-│   └── pom.xml
-├── frontend/
-│   ├── src/api/
-│   ├── src/components/
-│   ├── src/context/
-│   ├── src/pages/
-│   └── package.json
-├── docs/
-│   └── postman_collection.json
-├── docker-compose.yml
-├── .env.example
-├── .gitignore
-└── README.md
-```
-
-## Application Preview
+> Replace the image paths below with updated screenshots from the deployed application.
 
 ### Login Page
-![Login](docs/images/login-page.png)
+![Login Page](docs/images/login-page.png)
 
-### Dashboard
-![Dashboard](docs/images/dashboard-overview.png)
+### Production Dashboard
+![Production Dashboard](docs/images/dashboard-overview.png)
 
 ### Server Management
 ![Server Management](docs/images/server-management.png)
@@ -290,25 +58,365 @@ Production Monitoring System/
 ![Test Catalog](docs/images/test-catalog.png)
 
 ### Reports & Analytics
-![Reports](docs/images/reports-dashboard.png)
+![Reports & Analytics](docs/images/reports-dashboard.png)
 
-### Swagger API
-![Swagger](docs/images/swagger-api.png)
+### Swagger API Documentation
+![Swagger API](docs/images/swagger-api.png)
+
+---
+
+## Key Features
+
+- 🔐 **JWT Authentication**: Secure login flow with token-based authorization.
+- 🧑‍💼 **Role-Based Access Control**: Admin and restricted demo access for safer public portfolio review.
+- 🖥️ **Server Lifecycle Tracking**: Monitor units from intake through validation, debug, retest, passed, and released states.
+- 🧪 **Validation Test Management**: Track server test execution, status, results, evidence, and responsible owners.
+- ⚠️ **Failure Management**: Register failures with severity, status, corrective action, technician ownership, and log references.
+- 🧾 **Traceability Matrix**: Maintain serial-level history across server, rack, PDU, Raspberry device, test, engineer, technician, and result data.
+- 📊 **Production Monitoring Dashboard**: Operational KPIs, status charts, failure metrics, test metrics, and recent activity.
+- 📈 **Reports & Analytics**: Manufacturing-focused reporting for failure trends, model analysis, release readiness, and CSV exports.
+- 🔎 **Search and Filtering**: Enterprise-style filtering across servers, failures, traceability, reports, and test catalog modules.
+- 📚 **Swagger/OpenAPI Documentation**: REST API documentation for technical evaluation and backend review.
+- 📱 **Responsive UI**: Clean interface designed for desktop review and responsive portfolio presentation.
+- 🧱 **Layered Backend Architecture**: Controllers, services, repositories, DTOs, mappers, security, exceptions, and configuration.
+
+---
+
+## Architecture Overview
+
+Production Monitoring System follows a modern Full Stack architecture designed for a production-style portfolio deployment. The React + Vite frontend is deployed on Vercel and consumes secured REST endpoints through Axios. The Spring Boot REST API is deployed on Railway and uses Spring Security with JWT for authentication and authorization. Persistence is handled through Spring Data JPA, with operational data stored in a Railway-hosted MySQL database.
+
+```mermaid
+graph TD
+    A[React + Vite Frontend] -->|HTTPS REST API| B[Spring Boot Backend]
+    B --> C[Spring Security + JWT]
+    B --> D[Spring Data JPA]
+    D --> E[Railway MySQL Database]
+    A --> F[Vercel Hosting]
+    B --> G[Railway Backend Hosting]
+```
+
+This architecture separates the user interface, API layer, security layer, persistence layer, and managed database infrastructure. It demonstrates a recruiter-friendly deployment model that reflects how enterprise internal tools are commonly structured across frontend hosting, backend services, and relational data storage.
+
+---
+
+## Tech Stack
+
+### Frontend
+
+| Technology | Purpose |
+| --- | --- |
+| React | Component-based user interface |
+| Vite | Fast frontend development and production build |
+| JavaScript | Frontend application logic |
+| CSS | Custom enterprise UI styling and dark mode |
+| Axios | REST API communication |
+| React Router | Client-side routing |
+| Recharts | Dashboard and analytics charts |
+| Lucide React | Professional UI icons |
+
+> Note: The current repository implementation uses React with JavaScript and custom CSS. TypeScript and TailwindCSS can be added as future frontend modernization improvements.
+
+### Backend
+
+| Technology | Purpose |
+| --- | --- |
+| Java 17 | Backend language and runtime |
+| Spring Boot | REST API application framework |
+| Spring Web | HTTP controllers and REST endpoints |
+| Spring Security | Authentication and authorization |
+| JWT | Stateless user authentication |
+| Spring Data JPA | Persistence and repository layer |
+| Spring Validation | Request validation |
+| Maven | Dependency management and build tool |
+| Swagger/OpenAPI | API documentation |
+
+### Database
+
+| Technology | Purpose |
+| --- | --- |
+| MySQL | Relational database for operational records |
+| Railway MySQL | Production database hosting |
+| Docker Compose | Local MySQL development environment |
+
+### Deployment
+
+| Platform | Purpose |
+| --- | --- |
+| Vercel | Frontend deployment |
+| Railway | Backend deployment |
+| Railway MySQL | Managed production database |
+| GitHub | Source control and portfolio hosting |
+
+---
+
+## Local Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Daniel-Lopez-Pantoja/production-monitoring-system.git
+cd production-monitoring-system
+```
+
+### 2. Start MySQL Locally
+
+```bash
+docker compose up -d
+```
+
+Default local database:
+
+```text
+Database: production_monitoring
+Username: root
+Password: root
+```
+
+### 3. Configure Backend Environment
+
+Create or configure backend environment variables using your IDE, terminal, Railway variables, or `application.yml` defaults:
+
+```env
+DB_URL=jdbc:mysql://localhost:3306/production_monitoring?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USERNAME=root
+DB_PASSWORD=root
+JWT_SECRET=change-this-demo-jwt-secret-before-deployment-please
+JWT_EXPIRATION_MS=86400000
+```
+
+### 4. Run the Backend
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+Backend API:
+
+```text
+http://localhost:8080/api
+```
+
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+### 5. Configure Frontend Environment
+
+Create a `.env` file inside the `frontend` directory:
+
+```env
+VITE_API_URL=http://localhost:8080/api
+```
+
+### 6. Run the Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend URL:
+
+```text
+http://localhost:5173
+```
+
+### 7. Log In
+
+Use the restricted demo account for portfolio review:
+
+```text
+Email: demo@pms.local
+Password: demo123
+```
+
+---
+
+## Environment Variables
+
+### Frontend `.env`
+
+```env
+VITE_API_URL=https://production-monitoring-system-production.up.railway.app/api
+```
+
+### Backend Environment Variables
+
+```env
+DB_URL=jdbc:mysql://your-mysql-host:3306/production_monitoring
+DB_USERNAME=your_database_username
+DB_PASSWORD=your_database_password
+JWT_SECRET=replace-with-a-secure-production-secret
+JWT_EXPIRATION_MS=86400000
+```
+
+Sensitive credentials must be configured through deployment provider environment variables. Do not commit production secrets to GitHub.
+
+---
+
+## API Documentation
+
+Swagger UI is available after starting the backend:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+Production Swagger URL:
+
+```text
+https://production-monitoring-system-production.up.railway.app/swagger-ui/index.html
+```
+
+### Main API Endpoints
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | `/api/auth/login` | Authenticates a user and returns a JWT |
+| POST | `/api/auth/register` | Registers a new user using an admin account |
+| GET | `/api/dashboard` | Retrieves production dashboard metrics |
+| GET | `/api/servers` | Retrieves all registered servers |
+| POST | `/api/servers` | Creates a server record |
+| GET | `/api/servers/{id}` | Retrieves a server by ID |
+| PUT | `/api/servers/{id}` | Updates an existing server |
+| DELETE | `/api/servers/{id}` | Deletes a server |
+| GET | `/api/tests` | Retrieves the validation test catalog |
+| GET | `/api/server-tests` | Retrieves server test execution records |
+| POST | `/api/server-tests` | Registers a server test result |
+| GET | `/api/traceability` | Retrieves the traceability matrix |
+| POST | `/api/traceability` | Creates a traceability record |
+| GET | `/api/failures` | Retrieves registered failures |
+| POST | `/api/failures` | Registers a new failure |
+| GET | `/api/reports/servers-by-status` | Retrieves server status metrics |
+| GET | `/api/reports/failures-by-test` | Retrieves failure counts by test |
+| GET | `/api/reports/failures-by-model` | Retrieves failure counts by server model |
+| GET | `/api/pdus` | Retrieves registered PDUs |
+| GET | `/api/raspberries` | Retrieves registered Raspberry devices |
+
+The Postman collection is available at:
+
+```text
+docs/postman_collection.json
+```
+
+---
+
+## Project Structure
+
+```text
+Production Monitoring System/
+├── backend/
+│   ├── src/main/java/com/production/monitoring/
+│   │   ├── config/              # Application configuration and seed data
+│   │   ├── controller/          # REST API controllers
+│   │   ├── dto/                 # Request and response DTOs
+│   │   ├── exception/           # Centralized exception handling
+│   │   ├── mapper/              # Entity-to-DTO mapping helpers
+│   │   ├── model/
+│   │   │   ├── entity/          # JPA entities
+│   │   │   └── enums/           # Domain enums
+│   │   ├── repository/          # Spring Data JPA repositories
+│   │   ├── security/            # JWT filters and security services
+│   │   └── service/             # Business logic layer
+│   └── pom.xml
+│
+├── frontend/
+│   ├── src/
+│   │   ├── api/                 # Axios client and API calls
+│   │   ├── components/          # Shared layout and UI components
+│   │   ├── context/             # Authentication and theme context
+│   │   ├── pages/               # Application views
+│   │   └── styles.css           # Global enterprise UI styling
+│   ├── package.json
+│   └── vite.config.js
+│
+├── docs/
+│   ├── images/                  # Portfolio screenshots
+│   └── postman_collection.json
+│
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Security
+
+The application uses JWT-based authentication with Spring Security. After login, the backend returns a signed token that the frontend sends with protected API requests.
+
+### Access Model
+
+| Role | Purpose |
+| --- | --- |
+| ADMIN | Full administrative access for local/internal use |
+| ENGINEER | Validation, failure, test, and server workflow operations |
+| TECHNICIAN | Test result updates and operational execution support |
+| OPERATOR | Read-only operational visibility |
+| DEMO_USER | Restricted public portfolio account for safe review |
+
+The public demo account is intentionally restricted. Admin, engineer, technician, and operator credentials are not published for security reasons.
+
+### Security Practices Demonstrated
+
+- Stateless authentication with JWT.
+- Role-based access control.
+- Restricted public demo account.
+- Environment-based secret configuration.
+- Protected administrative operations.
+- No production credentials committed to the repository.
+
+---
+
+## Business Value
+
+This project demonstrates how software engineering can support real manufacturing and Test Engineering workflows. It goes beyond a basic CRUD application by modeling operational states, validation tests, server traceability, failure lifecycle management, corrective actions, reporting metrics, and production readiness visibility.
+
+It is especially relevant for roles involving:
+
+- Java Backend Development
+- Full Stack Development
+- Enterprise Software Engineering
+- Manufacturing Systems
+- Test Engineering Tools
+- Production Monitoring Platforms
+- Internal Operations Dashboards
+
+---
 
 ## Future Improvements
 
-- Complete create/edit workflows for all operational frontend modules.
-- Unit, integration, and API test coverage for services, controllers, and business rules.
-- Backend-driven CSV and PDF report generation.
-- Audit trail by authenticated user for traceability and failure history.
-- Evidence and log file upload using external or cloud storage.
-- Advanced analytics by date range, server model, severity, test category, and production line.
-- CI/CD pipeline with GitHub Actions.
-- Deployment profile for cloud or containerized environments.
-- Role-specific dashboards for engineers, technicians, operators, and administrators.
+- Advanced production charts with configurable date ranges.
+- Real-time monitoring using WebSockets or Server-Sent Events.
+- Exportable PDF and Excel reports.
+- Email or Slack notifications for critical failures.
+- KPI dashboard for throughput, yield, release readiness, and failure aging.
+- Historical analytics by model, test type, severity, rack, and cold room.
+- Audit trail for user actions and status changes.
+- Evidence/log file upload with cloud storage integration.
+- CI/CD pipeline with automated backend and frontend checks.
+- Automated integration tests for authentication, authorization, and business rules.
+
+---
 
 ## Author
 
-Juan Daniel López Pantoja
+**Danny Lopez Pantoja**
+
+Computer Engineering | Software Developer
 
 GitHub: [Daniel-Lopez-Pantoja](https://github.com/Daniel-Lopez-Pantoja)
+
+---
+
+## Suggested Commit
+
+```bash
+docs(readme): modernize portfolio documentation
+```
