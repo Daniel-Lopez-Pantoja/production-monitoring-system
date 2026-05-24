@@ -37,8 +37,6 @@ This account is intended for portfolio review only and has restricted permission
 
 ## Screenshots
 
-> Replace the image paths below with updated screenshots from the deployed application.
-
 ### Login Page
 ![Login Page](docs/images/login-page.png)
 
