@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
-import { buildSearchIndex, matchesSearch } from '../utils/search.js';
+import { buildSearchIndex, matchesExactEnum, matchesSearch, normalizeEnumText } from '../utils/search.js';
+
+const failureSeverityValues = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+const failureStatusValues = ['OPEN', 'IN_PROGRESS', 'RETEST_REQUIRED', 'CLOSED', 'FIXED'];
 
 // Normaliza nombres de pruebas recibidos desde la API.
 function displayTestName(name) {
@@ -30,13 +33,31 @@ function buildFailureSearchIndex(failure) {
   ]);
 }
 
+// Detecta si el usuario escribió exactamente un severity o status para evitar falsos positivos por búsqueda parcial.
+function getExactFailureEnumQuery(query) {
+  const severity = failureSeverityValues.find((value) => normalizeEnumText(query) === normalizeEnumText(value));
+  if (severity) return { field: 'severity', value: severity };
+
+  const status = failureStatusValues.find((value) => normalizeEnumText(query) === normalizeEnumText(value));
+  if (status) return { field: 'status', value: status };
+
+  return null;
+}
+
+// Filtra fallas priorizando coincidencias exactas de badges antes de hacer búsqueda parcial general.
+function matchesFailureQuery(failure, query) {
+  const exactEnum = getExactFailureEnumQuery(query);
+  if (exactEnum) return matchesExactEnum(exactEnum.value, failure[exactEnum.field]);
+  return matchesSearch(buildFailureSearchIndex(failure), query);
+}
+
 // Registro de fallas con filtros por serial, prueba, severidad, estado o técnico.
 export default function Failures() {
   const [failures, setFailures] = useState([]);
   const [query, setQuery] = useState('');
 
   useEffect(() => { api.get('/failures').then((res) => setFailures(res.data)); }, []);
-  const filtered = useMemo(() => failures.filter((failure) => matchesSearch(buildFailureSearchIndex(failure), query)), [failures, query]);
+  const filtered = useMemo(() => failures.filter((failure) => matchesFailureQuery(failure, query)), [failures, query]);
 
   return (
     <section className="page">

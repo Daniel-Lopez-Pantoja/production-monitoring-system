@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
-import { buildSearchIndex, matchesSearch, normalizeSearchText } from '../utils/search.js';
+import { buildSearchIndex, matchesSearch, normalizeNullableDisplayText } from '../utils/search.js';
 
 // Da formato legible a las fechas de trazabilidad sin ocupar demasiado espacio en la tabla.
 function formatTraceDate(value) {
@@ -31,7 +31,7 @@ function buildSearchText(record) {
     record.testStatus,
     record.result,
     record.detectedFailure,
-    record.severity,
+    record.severity || 'N/A',
     record.responsibleEngineer?.fullName,
     record.responsibleTechnician?.fullName,
     record.startDate,
@@ -56,7 +56,7 @@ export default function Traceability() {
   }, []);
 
   const filtered = useMemo(() => {
-    const normalizedQuery = normalizeSearchText(query);
+    const normalizedQuery = normalizeNullableDisplayText(query);
     if (!normalizedQuery) return records;
     return records.filter((record) => matchesSearch(buildSearchText(record), normalizedQuery));
   }, [records, query]);
