@@ -212,10 +212,10 @@ export default function Dashboard() {
         <div className="charts-grid four">
           <ChartPanel title="Servers by Status" subtitle="Vertical bar chart" className="status-chart-panel">
             {serversByStatus.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={serversByStatus} margin={{ top: 18, right: 10, left: -18, bottom: 42 }}>
+              <ResponsiveContainer width="100%" height={262}>
+                <BarChart data={serversByStatus} margin={{ top: 24, right: 10, left: -18, bottom: 36 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" interval={0} tick={{ fontSize: 10, fontWeight: 700 }} angle={-35} textAnchor="end" height={58} />
+                  <XAxis dataKey="name" interval={0} tick={{ fontSize: 10, fontWeight: 700 }} angle={-20} textAnchor="end" height={50} />
                   <YAxis allowDecimals={false} domain={[0, statusAxisMax]} ticks={statusAxisTicks} tick={{ fontSize: 11 }} />
                   <Tooltip content={<ChartTooltip />} />
                   <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={24}>
