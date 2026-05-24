@@ -4,6 +4,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   Legend,
   Line,
   LineChart,
@@ -18,6 +19,18 @@ import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
 
 const chartColors = ['#176b87', '#175cd3', '#067647', '#b86e00', '#b42318', '#7a271a', '#475467', '#6941c6', '#0e9384'];
+const statusColors = {
+  'IN TEST': '#175cd3',
+  FAILED: '#b42318',
+  RELEASED: '#067647',
+  'PENDING OS': '#b86e00',
+  DEBUG: '#6941c6',
+  RETEST: '#f79009',
+  PASSED: '#039855',
+  'READY FOR TEST': '#0e9384',
+  'OS INSTALLED': '#176b87',
+  DEFAULT: '#475467'
+};
 
 // Formatea fechas operativas para tablas recientes sin saturar la interfaz.
 function formatDate(value) {
@@ -38,6 +51,35 @@ function toChartData(data) {
   }));
 }
 
+// Ordena, filtra y colorea los estados para que el gráfico horizontal muestre solo datos operativos relevantes.
+function toStatusChartData(data) {
+  const preferredOrder = ['FAILED', 'RETEST', 'DEBUG', 'IN TEST', 'READY FOR TEST', 'PENDING OS', 'OS INSTALLED', 'PASSED', 'RELEASED'];
+  return toChartData(data)
+    .filter((item) => item.value > 0)
+    .map((item) => ({ ...item, color: statusColors[item.name] || statusColors.DEFAULT }))
+    .sort((a, b) => {
+      const aIndex = preferredOrder.indexOf(a.name);
+      const bIndex = preferredOrder.indexOf(b.name);
+      if (aIndex === -1 && bIndex === -1) return a.name.localeCompare(b.name);
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
+}
+
+// Calcula el máximo del eje X con base en el valor real más alto para evitar escalas visualmente exageradas.
+function getStatusAxisMax(items) {
+  const maxValue = Math.max(0, ...items.map((item) => item.value));
+  if (maxValue <= 1) return 1;
+  return Math.ceil(maxValue * 1.15);
+}
+
+// Genera ticks enteros y compactos para que el eje X sea legible cuando los conteos son pequeños.
+function getStatusAxisTicks(maxValue) {
+  if (maxValue <= 1) return [0, 1];
+  return Array.from({ length: maxValue + 1 }, (_, index) => index);
+}
+
 // Define el color visual de una métrica según su nivel de riesgo.
 function metricTone(value, dangerLimit = 1) {
   return Number(value || 0) >= dangerLimit ? 'danger' : 'success';
@@ -54,9 +96,9 @@ function MiniMetric({ label, value, tone = 'neutral' }) {
 }
 
 // Contenedor estándar para mantener consistencia entre todas las gráficas.
-function ChartPanel({ title, subtitle, children }) {
+function ChartPanel({ title, subtitle, children, className = '' }) {
   return (
-    <div className="panel chart-panel">
+    <div className={`panel chart-panel ${className}`}>
       <div className="panel-header">
         <h2>{title}</h2>
         <span>{subtitle}</span>
@@ -94,7 +136,9 @@ export default function Dashboard() {
     timestamp: server.updatedAt
   })), [data]);
 
-  const serversByStatus = useMemo(() => toChartData(data?.serversByStatus), [data]);
+  const serversByStatus = useMemo(() => toStatusChartData(data?.serversByStatus), [data]);
+  const statusAxisMax = useMemo(() => getStatusAxisMax(serversByStatus), [serversByStatus]);
+  const statusAxisTicks = useMemo(() => getStatusAxisTicks(statusAxisMax), [statusAxisMax]);
   const failuresBySeverity = useMemo(() => toChartData(data?.failuresBySeverity), [data]);
   const testsByResult = useMemo(() => toChartData(data?.testsByResult), [data]);
   const dailyThroughput = useMemo(() => Object.entries(data?.dailyTestThroughput || {}).map(([day, tests]) => ({ day, tests })), [data]);
@@ -166,16 +210,26 @@ export default function Dashboard() {
           <span>Manufacturing flow and validation quality indicators</span>
         </div>
         <div className="charts-grid four">
-          <ChartPanel title="Servers by Status" subtitle="Pie chart">
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie data={serversByStatus} dataKey="value" nameKey="name" outerRadius={88} label>
-                  {serversByStatus.map((entry, index) => <Cell key={entry.name} fill={chartColors[index % chartColors.length]} />)}
-                </Pie>
-                <Tooltip content={<ChartTooltip />} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+          <ChartPanel title="Servers by Status" subtitle="Vertical bar chart" className="status-chart-panel">
+            {serversByStatus.length > 0 ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={serversByStatus} margin={{ top: 18, right: 10, left: -18, bottom: 42 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" interval={0} tick={{ fontSize: 10, fontWeight: 700 }} angle={-35} textAnchor="end" height={58} />
+                  <YAxis allowDecimals={false} domain={[0, statusAxisMax]} ticks={statusAxisTicks} tick={{ fontSize: 11 }} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={24}>
+                    <LabelList dataKey="value" position="top" className="bar-value-label" />
+                    {serversByStatus.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="empty-state compact-empty-state">
+                <strong>No active server status data</strong>
+                <span>Status distribution will appear when servers enter the validation flow.</span>
+              </div>
+            )}
           </ChartPanel>
 
           <ChartPanel title="Failures by Severity" subtitle="Bar chart">
