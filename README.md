@@ -253,8 +253,6 @@ JWT_SECRET=replace-with-a-secure-production-secret
 JWT_EXPIRATION_MS=86400000
 ```
 
-Sensitive credentials must be configured through deployment provider environment variables. Do not commit production secrets to GitHub.
-
 ---
 
 ## API Documentation
