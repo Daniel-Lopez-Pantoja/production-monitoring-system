@@ -1,11 +1,12 @@
 package com.production.monitoring.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Catálogo maestro de pruebas que pueden ejecutarse sobre servidores.
+ * Master catalog of validation tests available for manufacturing workflows.
  */
 @Getter
 @Setter
@@ -24,6 +25,14 @@ public class TestCatalog {
 
     @Column(length = 1600)
     private String possibleFailures;
+
+    @Min(1)
+    @Column(nullable = false, columnDefinition = "int default 5")
+    private Integer estimatedMinMinutes = 5;
+
+    @Min(1)
+    @Column(nullable = false, columnDefinition = "int default 15")
+    private Integer estimatedMaxMinutes = 15;
 
     private boolean critical;
 }

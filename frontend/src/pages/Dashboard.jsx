@@ -32,7 +32,7 @@ const statusColors = {
   DEFAULT: '#475467'
 };
 
-// Formatea fechas operativas para tablas recientes sin saturar la interfaz.
+// Formats operational dates for recent activity tables.
 function formatDate(value) {
   if (!value) return 'N/A';
   return new Intl.DateTimeFormat('en-US', {
@@ -43,7 +43,7 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
-// Convierte mapas del backend en arreglos compatibles con Recharts.
+// Converts backend maps into arrays compatible with Recharts.
 function toChartData(data) {
   return Object.entries(data || {}).map(([name, value]) => ({
     name: name.replaceAll('_', ' '),
@@ -51,7 +51,7 @@ function toChartData(data) {
   }));
 }
 
-// Ordena, filtra y colorea los estados para que el gráfico horizontal muestre solo datos operativos relevantes.
+// Orders, filters, and colors server statuses by operational priority.
 function toStatusChartData(data) {
   const preferredOrder = ['FAILED', 'RETEST', 'DEBUG', 'IN TEST', 'READY FOR TEST', 'PENDING OS', 'OS INSTALLED', 'PASSED', 'RELEASED'];
   return toChartData(data)
@@ -67,25 +67,25 @@ function toStatusChartData(data) {
     });
 }
 
-// Calcula el máximo del eje X con base en el valor real más alto para evitar escalas visualmente exageradas.
+// Calculates a dynamic axis max based on the highest real value.
 function getStatusAxisMax(items) {
   const maxValue = Math.max(0, ...items.map((item) => item.value));
   if (maxValue <= 1) return 1;
   return Math.ceil(maxValue * 1.15);
 }
 
-// Genera ticks enteros y compactos para que el eje X sea legible cuando los conteos son pequeños.
+// Generates compact integer ticks for small operational counts.
 function getStatusAxisTicks(maxValue) {
   if (maxValue <= 1) return [0, 1];
   return Array.from({ length: maxValue + 1 }, (_, index) => index);
 }
 
-// Define el color visual de una métrica según su nivel de riesgo.
+// Defines the visual tone of a metric according to its risk level.
 function metricTone(value, dangerLimit = 1) {
   return Number(value || 0) >= dangerLimit ? 'danger' : 'success';
 }
 
-// Tarjeta compacta para mostrar KPIs de operación en formato de sala de control.
+// Compact card for control-room style operational KPIs.
 function MiniMetric({ label, value, tone = 'neutral' }) {
   return (
     <div className={`ops-metric ops-${tone}`}>
@@ -95,7 +95,7 @@ function MiniMetric({ label, value, tone = 'neutral' }) {
   );
 }
 
-// Contenedor estándar para mantener consistencia entre todas las gráficas.
+// Standard chart container used to keep dashboard panels consistent.
 function ChartPanel({ title, subtitle, children, className = '' }) {
   return (
     <div className={`panel chart-panel ${className}`}>
@@ -108,7 +108,7 @@ function ChartPanel({ title, subtitle, children, className = '' }) {
   );
 }
 
-// Tooltip personalizado para que las gráficas mantengan una lectura clara en ambos temas.
+// Custom tooltip for readable charts in light and dark themes.
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
@@ -119,7 +119,7 @@ function ChartTooltip({ active, payload, label }) {
   );
 }
 
-// Dashboard operativo para monitoreo de manufactura y Test Engineering.
+// Operational dashboard for manufacturing and Test Engineering monitoring.
 export default function Dashboard() {
   const [data, setData] = useState(null);
 
@@ -130,11 +130,20 @@ export default function Dashboard() {
   const recentActivity = useMemo(() => (data?.latestServers || []).map((server) => ({
     id: server.id,
     serial: server.serialNumber,
-    action: 'Server status updated',
+    action: server.currentRunningTest || 'Server status updated',
     engineer: server.responsibleEngineer?.fullName || 'Unassigned',
     status: server.status,
+    progress: server.serverProgressPercentage || 0,
+    remaining: server.estimatedRemainingTime || '0h 0m',
     timestamp: server.updatedAt
   })), [data]);
+
+  const averageProgress = useMemo(() => {
+    const servers = data?.latestServers || [];
+    if (!servers.length) return 0;
+    const totalProgress = servers.reduce((total, server) => total + Number(server.serverProgressPercentage || 0), 0);
+    return Math.round(totalProgress / servers.length);
+  }, [data]);
 
   const serversByStatus = useMemo(() => toStatusChartData(data?.serversByStatus), [data]);
   const statusAxisMax = useMemo(() => getStatusAxisMax(serversByStatus), [serversByStatus]);
@@ -171,6 +180,7 @@ export default function Dashboard() {
           <MiniMetric label="Pending OS" value={data.pendingOsServers} tone="warning" />
           <MiniMetric label="Debug" value={data.debugServers} tone="warning" />
           <MiniMetric label="Retest" value={data.retestServers} tone="warning" />
+          <MiniMetric label="Avg Progress" value={`${averageProgress}%`} tone="info" />
         </div>
       </div>
 
@@ -279,7 +289,7 @@ export default function Dashboard() {
             <span>Latest server updates</span>
           </div>
           <table>
-            <thead><tr><th>Serial</th><th>Action</th><th>Engineer</th><th>Status</th><th>Timestamp</th></tr></thead>
+            <thead><tr><th>Serial</th><th>Current Running Test</th><th>Engineer</th><th>Status</th><th>Progress</th><th>Remaining</th><th>Timestamp</th></tr></thead>
             <tbody>
               {recentActivity.map((item) => (
                 <tr key={item.id}>
@@ -287,6 +297,13 @@ export default function Dashboard() {
                   <td>{item.action}</td>
                   <td>{item.engineer}</td>
                   <td><StatusBadge value={item.status} /></td>
+                  <td>
+                    <div className="mini-progress">
+                      <span style={{ width: `${item.progress}%` }} />
+                    </div>
+                    <strong>{item.progress}%</strong>
+                  </td>
+                  <td>{item.remaining}</td>
                   <td>{formatDate(item.timestamp)}</td>
                 </tr>
               ))}

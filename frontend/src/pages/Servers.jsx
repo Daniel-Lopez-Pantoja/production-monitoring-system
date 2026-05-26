@@ -5,7 +5,7 @@ import StatusBadge from '../components/StatusBadge.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { buildSearchIndex, matchesSearch } from '../utils/search.js';
 
-// Construye el índice de búsqueda de servidores normalizando estados enum como READY_FOR_TEST.
+// Builds the server search index and normalizes enum-like values such as READY_FOR_TEST.
 function buildServerSearchIndex(server) {
   return buildSearchIndex([
     server.internalId,
@@ -13,7 +13,10 @@ function buildServerSearchIndex(server) {
     server.model,
     server.rackNumber,
     server.location,
+    server.nicheNumber,
     server.status,
+    server.currentRunningTest,
+    server.estimatedRemainingTime,
     server.responsibleEngineer?.fullName,
     server.assignedTechnician?.fullName,
     server.observations,
@@ -22,7 +25,7 @@ function buildServerSearchIndex(server) {
   ]);
 }
 
-// Lista de servidores con búsqueda por serial, modelo, estado, ingeniero o técnico.
+// Lists servers with manufacturing progress, location, niche, and operational search.
 export default function Servers() {
   const [servers, setServers] = useState([]);
   const [query, setQuery] = useState('');
@@ -39,10 +42,10 @@ export default function Servers() {
         <div><h1>Server Management</h1><p>Registration and lifecycle tracking for R9, R10 and additional validation units.</p></div>
         {!isDemoUser && <Link className="primary-link" to="/servers/new">New Server</Link>}
       </div>
-      <input className="search" placeholder="Search by serial, model, status, engineer or technician..." value={query} onChange={(e) => setQuery(e.target.value)} />
+      <input className="search" placeholder="Search by serial, model, status, current test, location, niche, engineer or technician..." value={query} onChange={(e) => setQuery(e.target.value)} />
       <div className="panel table-panel">
         <table>
-          <thead><tr><th>Serial</th><th>Model</th><th>Rack</th><th>Location</th><th>Status</th><th>Owner</th></tr></thead>
+          <thead><tr><th>Serial</th><th>Model</th><th>Rack</th><th>Location</th><th>Niche</th><th>Status</th><th>Progress</th><th>Current Test</th><th>Remaining</th><th>Owner</th></tr></thead>
           <tbody>
             {filtered.map((server) => (
               <tr key={server.id}>
@@ -50,7 +53,16 @@ export default function Servers() {
                 <td>{server.model}</td>
                 <td>{server.rackNumber}</td>
                 <td>{server.location}</td>
+                <td>{server.nicheNumber || 'N/A'}</td>
                 <td><StatusBadge value={server.status} /></td>
+                <td>
+                  <div className="mini-progress">
+                    <span style={{ width: `${server.serverProgressPercentage || 0}%` }} />
+                  </div>
+                  <strong>{server.serverProgressPercentage || 0}%</strong>
+                </td>
+                <td>{server.currentRunningTest || 'Pending Start'}</td>
+                <td>{server.estimatedRemainingTime || '0h 0m'}</td>
                 <td>{server.responsibleEngineer?.fullName || 'Unassigned'}</td>
               </tr>
             ))}

@@ -284,6 +284,8 @@ https://production-monitoring-system-production.up.railway.app/swagger-ui/index.
 | GET | `/api/tests` | Retrieves the validation test catalog |
 | GET | `/api/server-tests` | Retrieves server test execution records |
 | POST | `/api/server-tests` | Registers a server test result |
+| GET | `/api/manufacturing-tests/server/{serverId}` | Retrieves the ordered manufacturing test pipeline for a server |
+| PUT | `/api/manufacturing-tests/{id}/status` | Updates the status of a manufacturing pipeline test |
 | GET | `/api/traceability` | Retrieves the traceability matrix |
 | POST | `/api/traceability` | Creates a traceability record |
 | GET | `/api/failures` | Retrieves registered failures |
@@ -410,9 +412,3 @@ Computer Engineering | Software Developer
 GitHub: [Daniel-Lopez-Pantoja](https://github.com/Daniel-Lopez-Pantoja)
 
 ---
-
-## Suggested Commit
-
-```bash
-docs(readme): modernize portfolio documentation
-```

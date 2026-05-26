@@ -3,7 +3,7 @@ import api from '../api/api';
 import StatusBadge from '../components/StatusBadge.jsx';
 import { buildSearchIndex, matchesSearch, normalizeNullableDisplayText } from '../utils/search.js';
 
-// Da formato legible a las fechas de trazabilidad sin ocupar demasiado espacio en la tabla.
+// Formats traceability dates without adding visual noise to the table.
 function formatTraceDate(value) {
   if (!value) return 'N/A';
   return new Intl.DateTimeFormat('en-US', {
@@ -15,13 +15,14 @@ function formatTraceDate(value) {
   }).format(new Date(value));
 }
 
-// Une los campos importantes de un registro para permitir búsqueda operacional por serial, rack, PDU, prueba, falla o responsable.
+// Combines key traceability fields for operational search by serial, rack, PDU, test, failure, or owner.
 function buildSearchText(record) {
   return buildSearchIndex([
     record.server?.serialNumber,
     record.server?.model,
     record.server?.rackNumber,
     record.server?.location,
+    record.server?.nicheNumber,
     record.coldRoom,
     record.physicalLocation,
     record.pdu?.name,
@@ -41,7 +42,7 @@ function buildSearchText(record) {
   ]);
 }
 
-// Matriz de trazabilidad con carga, error, estado vacío y búsqueda por campos técnicos clave.
+// Traceability matrix with loading, error, empty state, and technical field search.
 export default function Traceability() {
   const [records, setRecords] = useState([]);
   const [query, setQuery] = useState('');
@@ -70,7 +71,7 @@ export default function Traceability() {
 
       <input
         className="search"
-        placeholder="Search by serial, model, rack, location, PDU, Raspberry, test, status, result, failure, severity, engineer, technician or date..."
+        placeholder="Search by serial, model, rack, niche, location, PDU, Raspberry, test, status, result, failure, severity, engineer, technician or date..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -87,6 +88,7 @@ export default function Traceability() {
                 <th>Model</th>
                 <th>Rack</th>
                 <th>Location</th>
+                <th>Niche</th>
                 <th>Test</th>
                 <th>Status</th>
                 <th>Result</th>
@@ -105,6 +107,7 @@ export default function Traceability() {
                   <td>{record.server?.model || 'N/A'}</td>
                   <td>{record.server?.rackNumber || record.physicalLocation || 'N/A'}</td>
                   <td>{record.coldRoom || record.server?.location || 'N/A'}</td>
+                  <td>{record.server?.nicheNumber || 'N/A'}</td>
                   <td>{record.testCatalog?.name || 'N/A'}</td>
                   <td><StatusBadge value={record.testStatus} /></td>
                   <td>

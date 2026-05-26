@@ -5,16 +5,29 @@ import { buildSearchIndex, matchesSearch, normalizeSearchText } from '../utils/s
 
 const filters = ['All', 'Critical', 'Standard', 'Hardware', 'Firmware', 'Network', 'Thermal', 'Power', 'Storage'];
 
-// Normaliza los datos visibles del catálogo sin modificar el contrato del backend.
+// Normalizes visible catalog data while keeping the backend contract as the source of truth.
 function getDisplayTest(test) {
   return {
     name: test.name,
     validates: test.validates,
-    possibleFailures: test.possibleFailures
+    possibleFailures: test.possibleFailures,
+    estimatedDuration: formatEstimatedDuration(test)
   };
 }
 
-// Enriquece cada prueba con categoría, icono, componentes y acción recomendada para mejorar la experiencia visual.
+// Formats the estimated duration range provided by the backend catalog.
+function formatEstimatedDuration(test) {
+  const min = Number(test.estimatedMinMinutes || 0);
+  const max = Number(test.estimatedMaxMinutes || 0);
+  return `${min}–${max} min`;
+}
+
+// Formats a single estimated minute value from the backend catalog payload.
+function formatMinuteValue(value) {
+  return `${Number(value || 0)} min`;
+}
+
+// Enriches each test with category, icon, components, and recommended action for a stronger visual experience.
 function getTestMetadata(test) {
   const display = getDisplayTest(test);
   const name = `${test.name} ${display.name}`.toLowerCase();
@@ -42,13 +55,13 @@ function getTestMetadata(test) {
   return { category: 'Hardware', Icon: Wrench, components: 'Server platform, test fixture, validation tooling', action: 'Review test logs, confirm setup conditions and repeat validation after corrective action.' };
 }
 
-// Genera un resumen corto para mostrar las cards colapsadas sin perder contexto técnico.
+// Generates a short summary for collapsed cards without losing technical context.
 function shortSummary(text) {
   if (!text) return 'Validation criteria pending documentation.';
   return text.length > 118 ? `${text.slice(0, 118)}...` : text;
 }
 
-// Página moderna del catálogo de pruebas con filtros, búsqueda y detalles expandibles.
+// Modern test catalog page with filters, search, estimated duration, and expandable details.
 export default function TestCatalog() {
   const [tests, setTests] = useState([]);
   const [query, setQuery] = useState('');
@@ -63,7 +76,7 @@ export default function TestCatalog() {
     const normalizedQuery = normalizeSearchText(query);
     return enrichedTests.filter((test) => {
       const badge = test.critical ? 'critical' : 'standard';
-      const searchable = buildSearchIndex([test.display.name, test.display.validates, test.display.possibleFailures, test.meta.category, test.meta.components, badge]);
+      const searchable = buildSearchIndex([test.display.name, test.display.validates, test.display.possibleFailures, test.display.estimatedDuration, test.estimatedMinMinutes, test.estimatedMaxMinutes, test.meta.category, test.meta.components, badge]);
       const matchesQuery = matchesSearch(searchable, normalizedQuery);
       const matchesFilter = activeFilter === 'All'
         || (activeFilter === 'Critical' && test.critical)
@@ -73,7 +86,7 @@ export default function TestCatalog() {
     });
   }, [activeFilter, enrichedTests, query]);
 
-  // Alterna la vista expandida de una prueba individual.
+  // Toggles the expanded view for a single validation test.
   function toggleExpanded(id) {
     setExpanded((current) => ({ ...current, [id]: !current[id] }));
   }
@@ -121,6 +134,10 @@ export default function TestCatalog() {
                 <span className={test.critical ? 'badge badge-critical' : 'badge'}>{test.critical ? 'Critical' : 'Standard'}</span>
               </div>
               <p>{shortSummary(test.display.validates)}</p>
+              <div className="estimated-duration">
+                <span>Estimated Duration</span>
+                <strong>{test.display.estimatedDuration}</strong>
+              </div>
               <button className="ghost-button" onClick={() => toggleExpanded(test.id)}>
                 {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                 {isExpanded ? 'Hide details' : 'View details'}
@@ -128,6 +145,8 @@ export default function TestCatalog() {
               {isExpanded && (
                 <div className="test-details">
                   <div><strong>What it validates</strong><span>{test.display.validates}</span></div>
+                  <div><strong>Minimum estimated time</strong><span>{formatMinuteValue(test.estimatedMinMinutes)}</span></div>
+                  <div><strong>Maximum estimated time</strong><span>{formatMinuteValue(test.estimatedMaxMinutes)}</span></div>
                   <div><strong>Possible failures</strong><span>{test.display.possibleFailures}</span></div>
                   <div><strong>Recommended action</strong><span>{test.meta.action}</span></div>
                   <div><strong>Related components</strong><span>{test.meta.components}</span></div>

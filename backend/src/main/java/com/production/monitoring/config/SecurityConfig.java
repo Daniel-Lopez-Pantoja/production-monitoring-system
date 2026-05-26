@@ -21,7 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 /**
- * Configura seguridad stateless con JWT, roles y CORS para React.
+ * Configures stateless JWT security, role-based authorization, and CORS for the React frontend.
  */
 @Configuration
 @EnableMethodSecurity
@@ -37,12 +37,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                        // DEMO_USER es read-only para proteger la demo pública y evitar cambios destructivos.
+                        // DEMO_USER is read-only to protect public demo data from destructive changes.
                         .requestMatchers(HttpMethod.GET, "/api/dashboard").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")
                         .requestMatchers(HttpMethod.GET, "/api/servers").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")
                         .requestMatchers(HttpMethod.GET, "/api/servers/**").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")
                         .requestMatchers(HttpMethod.GET, "/api/tests").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")
                         .requestMatchers(HttpMethod.GET, "/api/server-tests").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")
+                        .requestMatchers(HttpMethod.GET, "/api/manufacturing-tests/**").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")
                         .requestMatchers(HttpMethod.GET, "/api/traceability").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")
                         .requestMatchers(HttpMethod.GET, "/api/failures").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")
                         .requestMatchers(HttpMethod.GET, "/api/reports/**").hasAnyRole("ADMIN", "ENGINEER", "TECHNICIAN", "OPERATOR", "DEMO_USER")

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configura la documentación Swagger/OpenAPI visible en /swagger-ui.html.
+ * Configures the Swagger/OpenAPI documentation available through the Swagger UI route.
  */
 @Configuration
 public class OpenApiConfig {
